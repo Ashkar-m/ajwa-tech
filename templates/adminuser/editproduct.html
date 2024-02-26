@@ -37,10 +37,8 @@
                             <div class="form-group">
                                 <label>Product Category</label>
                                 <select class="form-control" name="product_category">
-                                    <option value="" selected disabled>Select Category</option>
-                                        {% if product.category %}
-                                            <option value="{{ product.category }}" selected>{{ product.category }}</option>
-                                        {% endif %}
+                                    <option value="{{ product.category }}" selected disabled>{{ product.category }}</option>
+                                        
                                     {% for category in categorys %}
                                         {% if category.delete_status != 0%}
                                             {% if product.category != category.name %}
