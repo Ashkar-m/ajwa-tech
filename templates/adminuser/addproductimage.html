@@ -1,0 +1,108 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+        {% for message in messages %}
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                            {{ message }}
+                        </div>
+        {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h4 class="page-title">Product Images</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form method="post" enctype="multipart/form-data" id="ProductImage">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <h4>Current Images</h4>
+                                
+                                {% for product_image in product.images.all %}
+                                    <div class="image-container">
+                                        <img width="300" height="300" src="{{ product_image.image.url }}" alt="{{ product_image.image.url }} Image" class="current-image">
+                                        <input  type="file" id="image_{{ product_image.id }}" name="image_{{ product_image.id }}" class="form-control-file" accept="image/*">
+                                        <a href="{% url 'deleteproductimage' pk=product_image.id %}"><button class="btn btn-primary submit-btn" type="button">Delete Image</button></a><br><br>
+                                {% endfor %}
+                                {% if product.images.count < 5 %}
+                                    <div class="add-new-image"><br><br><br>
+                                        <h4 class="page-title">Add New Image:</h4>
+                                        <input type="file" id="new_image" name="new_image" class="form-control-file" accept="image/*">
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="m-t-20 text-center">
+                        <button class="btn btn-primary submit-btn" type="submit">Save Changes</button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    $().ready(function () {
+        $("#ProductImage").validate({
+            rules: {
+                new_image: {
+                    extension: "jpg|jpeg|png|gif", // Add more extensions if needed
+                    accept: "image/*", 
+                },
+                {% for product_image in product.images.all %}
+                "image_{{ product_image.id }}": {
+                    extension: "jpg|jpeg|png|gif", // Add more extensions if needed
+                    accept: "image/*", 
+                },
+                {% endfor %}
+            },
+            messages: {
+                new_image: {
+                    extension: "Only image files are allowed (jpg, jpeg, png, gif).",
+                    accept: "Only image files are allowed.",
+                },
+                {% for product_image in product.images.all %}
+                "image_{{ product_image.id }}": {
+                    extension: "Only image files are allowed (jpg, jpeg, png, gif).",
+                    accept: "Only image files are allowed.",
+                },
+                {% endfor %}
+            },
+        });
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <title>AJWA TECH</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/product/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% block topbar %}
+    
+    {% endblock %}
+
+    {% block navbar %}
+    
+    {% endblock %}
+    
+    {% block feature %}
+    
+    {% endblock %}
+
+    {% block category %}
+    
+    {% endblock %}
+
+    {% block product %}
+    
+    {% endblock %}
+
+    {% block content %}
+    
+    {% endblock %}
+
+    {% block footer %}
+    
+    {% endblock %}
+
+
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/product/main.js"></script>
+
+
+    <!-- limiting the time of message into 5 seconds -->
+    <script>
+        // Wait for the DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all elements with the class 'messages' (adjust as needed)
+            var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+            // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+            messageElements.forEach(function(messageElement) {
+                setTimeout(function() {
+                    messageElement.style.display = 'none';
+                }, 5000);  // Adjust the time as needed (in milliseconds)
+            });
+        });
+    </script>
+    <!-- Add this script in your HTML template, preferably at the end of the body tag -->
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,209 @@
+{% extends 'product/base_layout.html' %}
+<html>
+    <head>
+        {% load static %}
+        
+    </head>
+    <body>
+        
+        {% block topbar %}
+
+        {% include 'product/top_bar.html' %}
+        
+        {% endblock %}
+
+        {% block navbar %}
+
+        {% include 'product/detail_topbar.html' %}
+        
+        {% endblock %}
+
+
+{% block product %}
+
+
+ 
+<div class="container-fluid py-5" id="product_details">
+    <div class="row px-xl-5">
+        <div class="carousel-container col-lg-5 pb-5 ">
+            <div id="product-carousel" class="carousel slide " data-ride="carousel">
+                <aside class="col-lg-9" >
+                    <div class="border rounded-4 mb-3 d-flex justify-content-center card product-item border-0 mb-4">
+                        <div class="magnify-container card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                            <a data-fslightbox="mygalley" class="rounded-4" target="_blank" data-type="image">
+                                <img id="mainImage" style="max-width: 100%; max-height: 100vh; margin: auto;" class="rounded-4 fit" src="{{ product.images.first.image.url }}" >
+                            </a>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mb-3">
+                        {% for product_image in product.images.all %}
+                        <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" onclick="changeMainImage('{{ product_image.image.url }}')">
+                            <img width="60" height="60" class="rounded-2" src="{{ product_image.image.url }}" >
+                        </a>
+                        {% endfor %}
+                    </div>
+                </aside>
+            </div>
+        </div>
+        <div class="col-lg-7 pb-5">
+            <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'category' slug=product.category.slug %}">{{ product.category }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            </ol>
+            </nav>
+            <h3 class="font-weight-semi-bold">{{ product.name }}</h3>
+            <div class="d-flex mb-3">
+                <div class="text-primary mr-2">
+                    <small class="fas fa-star"></small>
+                    <small class="fas fa-star"></small>
+                    <small class="fas fa-star"></small>
+                    <small class="fas fa-star-half-alt"></small>
+                    <small class="far fa-star"></small>
+                </div>
+                <small class="pt-1">(50 Reviews)</small>
+            </div>
+            <h3 class="font-weight-semi-bold mb-4">{{ product.price }}</h3>
+            <p class="mb-4">{{ product.description }}</p>
+            {% if product.delete_status == 0 %}
+                <h3 class="font-weight-semi-bold mb-4">Product Unavailable</h3>
+            {% elif product.available %}
+            <div class="d-flex align-items-center mb-4 pt-2">
+                <div class="input-group quantity mr-3" style="width: 130px;">
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary btn-minus">
+                        <i class="fa fa-minus"></i>
+                        </button>
+                    </div>
+                    <input type="text" class="form-control bg-secondary text-center" value="1">
+                    <div class="input-group-btn">
+                        <button class="btn btn-primary btn-plus">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+            </div>
+            {% else %}
+            <h3 class="font-weight-semi-bold mb-4">Out of stock</h3>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row px-xl-5">
+        <div class="col">
+            <div class="nav nav-tabs justify-content-center border-secondary mb-4">
+                <a class="nav-item nav-link" data-toggle="tab" href="#tab-pane-1">Description</a>
+            
+                <a class="nav-item nav-link active" data-toggle="tab" href="#tab-pane-3">Reviews (0)</a>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade" id="tab-pane-1">
+                    <h4 class="mb-3">Product Description</h4>
+                    {{ product.description }}
+                    </div>
+                
+                <div class="tab-pane fade active show" id="tab-pane-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4 class="mb-4">1 review for "{{product.name}}"</h4>
+                            <div class="media mb-4">
+                                <img src="{% static 'img/product/user.jpg' %}" alt="Image" class="zoom img-fluid mr-3 mt-1" style="width: 45px;"  data-magnify-src="{% static 'img/product/dell4.jpg' %}">
+                                <div class="media-body">
+                                    <h6>John Doe<small> - <i>01 Jan 2045</i></small></h6>
+                                    <div class="text-primary mb-2">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star-half-alt"></i>
+                                        <i class="far fa-star"></i>
+                                    </div>
+                                    <p>Diam amet duo labore stet elitr ea clita ipsum, tempor labore accusam ipsum et no at. Kasd diam tempor rebum magna dolores sed sed eirmod ipsum.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="mb-4">Leave a review</h4>
+                            <small>Your email address will not be published. Required fields are marked *</small>
+                            <div class="d-flex my-3">
+                                <p class="mb-0 mr-2">Your Rating * :</p>
+                                <div class="text-primary">
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star"></i>
+                                </div>
+                            </div>
+                            <form>
+                                <div class="form-group">
+                                    <label for="message">Your Review *</label>
+                                    <textarea id="message" cols="30" rows="5" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Your Name *</label>
+                                    <input type="text" class="form-control" id="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Your Email *</label>
+                                    <input type="email" class="form-control" id="email">
+                                </div>
+                                <div class="form-group mb-0">
+                                    <input type="submit" value="Leave Your Review" class="btn btn-primary px-3">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    <div class="container-fluid pt-5">
+        <div class="text-center mb-4">
+            <h2 class="section-title px-5"><span class="px-2">Related Products</span></h2>
+        </div>
+        <div id="products" class="row px-xl-5 pb-3">
+            {% for product in related_products|slice:":4" %}
+            <div class="col-lg-3 col-md-6 col-sm-12 pb-1">
+                <div class="card product-item border-0 mb-4">
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        <img class="img-fluid w-100" src="{{ product.images.first.image.url }}" alt="">
+                    </div>
+                    <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                        <h6 class="text-truncate mb-3"><a href="{% url 'detail' slug=product.slug %}">{{ product.name }}</a></h6>
+                        <div class="d-flex justify-content-center">
+                            <h6>{{ product.price }}</h6><h6 class="text-muted ml-2"><del>{{ product.price }}</del></h6>
+                        </div>
+                    </div>
+                    <div  class="card-footer d-flex justify-content-between bg-light border">
+                        <a href="{% url 'detail' slug=product.slug %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                        <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+           
+        </div>
+    </div>
+</div>
+
+
+<!-- change image javascripts -->
+    <script>
+    function changeMainImage(imageSrc) {
+        document.getElementById('mainImage').src = imageSrc;
+    }
+    </script>
+    
+    
+
+{% endblock %}
+
+
+    </body>
+</html>
+{% block footer %}
+{% include 'product/footer.html' %}
+{% endblock %}

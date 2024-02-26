@@ -1,0 +1,71 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-sm-4 col-3">
+                <h4 class="page-title">Users</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-border table-striped custom-table datatable mb-0">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>verified</th>
+                                <th class="text-right">Block/Unblock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users|dictsort:"id" %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td><img width="28" height="28" src="{% static 'css/adminuser/assets/img/user.jpg' %}" class="rounded-circle m-r-5" alt="">{{ user.name }}</td>
+                                <td>{{ user.user.username }}</td>
+                                <td>{{ user.user.email }}</td>
+                                <td>{{ user.is_verified }}</td>
+                                <td class="text-right">
+                                            <a href="{% url 'blockuser' pk=user.id %}" class="text-success" style="text-decoration: none;">Block</a>/
+                                            <a href="{% url 'unblockuser' pk=user.id %}" class="text-danger" style="text-decoration: none;"> Unblock</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

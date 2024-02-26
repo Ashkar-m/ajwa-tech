@@ -1,0 +1,109 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+        {% for message in messages %}
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                            {{ message }}
+                        </div>
+        {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h4 class="page-title">Add Category</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form method="post" enctype="multipart/form-data" id="categoryAdd">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Category Name</label>
+                                        <input type="text" class="form-control " name="category_name">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label>Category Image</label>
+                                <input type="file" class="form-control-file" name="category_image" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-t-20 text-center">
+                        <button class="btn btn-primary submit-btn" type="submit">Create Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    $().ready(function () {
+        $("#categoryAdd").validate({
+            rules: {
+                category_name: {
+                    required: true,
+                    validCategoryName: true,
+                },
+                category_image: {
+                    required: true,
+                    extension: "jpg|jpeg|png|gif", // Add more extensions if needed
+                    accept: "image/*", 
+                },
+            },
+            messages: {
+                category_name: {
+                    required: "Please enter your category name.",
+                    validCategoryName: "Please enter a valid category name (only characters).",
+                },
+                category_image: {
+                    required: "Please select a category image.",
+                    extension: "Only image files are allowed (jpg, jpeg, png, gif).",
+                    accept: "Only image files are allowed.",
+                },
+            },
+        });
+
+        $.validator.addMethod(
+            "validCategoryName",
+            function (value, element) {
+                return /^[a-zA-Z][a-zA-Z\s]*$/.test(value);
+            },
+            "Please enter a valid category name (only characters)."
+        );
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-sm-4 col-3">
+                <h4 class="page-title">Products</h4>
+            </div>
+            <div class="col-sm-8 col-9 text-right m-b-20">
+                <a href="{% url 'addproduct' %}" class="btn btn btn-primary btn-rounded float-right"><i class="fa fa-plus"></i> Add Product</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-border table-striped custom-table datatable mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product id</th>
+                                <th>Product Name</th>
+                                <th>Description</th>
+                                <th>Price</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Product Image</th>
+                                <th>Product Status</th>
+                                <th >Edit/Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products|dictsort:"id" %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.description }}</td>
+                                <td>{{ product.price }}</td>
+                                <td>{{ product.category }}</td>
+                                <td>{{ product.stock }}</td>
+                                <td><a href="{% url 'addproductimage' pk=product.id %}">Product Image</a></td>
+                                <td> {% if product.delete_status == 1 %}
+                                    Live
+                                {% elif product.delete_status == 0 %}
+                                    Delete
+                                {% endif %}</td>
+                                <td class="text-right">
+                                            <a href="{% url 'editproduct' pk=product.pk %}" class="text-success" style="text-decoration: none;">Edit</a>/
+                                            <a href="{% url 'deleteproduct' pk=product.pk %}" class="text-danger" style="text-decoration: none;"> Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

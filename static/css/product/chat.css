@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  
+  .carousel-container {
+    overflow: hidden;
+    width: 400px; /* Set a fixed width for the container */
+  }
+  
+  .carousel {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+  }
+  
+  .carousel-item {
+    width: 100%;
+    height: auto;
+    margin-right: 10px; /* Adjust spacing between images */
+    transition: transform 0.3s ease-out;
+  }
+  
+  .carousel-item:hover {
+    transform: scale(1.2); /* Adjust the magnification level as needed */
+    z-index: 1;
+  }
