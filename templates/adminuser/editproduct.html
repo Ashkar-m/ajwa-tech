@@ -37,7 +37,7 @@
                             <div class="form-group">
                                 <label>Product Category</label>
                                 <select class="form-control" name="product_category">
-                                    <option value="{{ product.category }}" selected disabled>{{ product.category }}</option>
+                                    <option value="{{ product.category }}" selected>{{ product.category }}</option>
                                         
                                     {% for category in categorys %}
                                         {% if category.delete_status != 0%}
@@ -119,9 +119,6 @@
                     required: true,
                     validDescription:true,
                 },
-                product_category: {
-                    required: true,
-                },
             },
             messages: {
                 product_name: {
@@ -143,9 +140,6 @@
                 product_description: {
                     required: "Please enter your product description.",
                     validDescription:"enter valid description."
-                },
-                product_category: {
-                    required: "Please select a product category.",
                 },
             },
         });

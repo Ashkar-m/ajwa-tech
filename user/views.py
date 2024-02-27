@@ -73,7 +73,7 @@ def userReg(request):
 
             # for otp expiry
             # request.session['otp_expiry'] = str(timezone.now() + otp_expiry_time)
-            otp_expiry_time = 60
+            otp_expiry_time = 600
             request.session['otp_expiry'] = str(timezone.now() + timedelta(seconds=otp_expiry_time))
 
             username=request.POST.get('username')
@@ -111,7 +111,7 @@ def userReg(request):
             send_mail("User Date: ", f"Verify your mail by OTP: {otp}", settings.EMAIL_HOST_USER, [email], fail_silently=False)
 
             red=redirect(f'/otp/{user.pk}/')
-            red.set_cookie("can_otp_enter",True,max_age=60)
+            red.set_cookie("can_otp_enter",True,max_age=600)
             return red
             
     except Exception as e:
@@ -212,7 +212,7 @@ def resendOtp(request, pk):
             new_otp = random.randint(100000, 999999)
             request.session['otp'] = new_otp
 
-            otp_expiry_time=60
+            otp_expiry_time=600
             request.session['otp_expiry'] = str(timezone.now() + timedelta(seconds=otp_expiry_time))
 
 
@@ -227,7 +227,7 @@ def resendOtp(request, pk):
             # Set a new cookie for allowing OTP entry
             messages.success(request, "Otp Resend Successfully.")
             response = redirect(f'/otp/{pk}/')
-            response.set_cookie('resend_otp', True,max_age=60)
+            response.set_cookie('resend_otp', True,max_age=600)
 
             return response
         else:

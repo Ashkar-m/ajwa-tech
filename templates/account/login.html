@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="media-options">
-                    <a href="{% provider_login_url 'google' method='oauth2' %}" class="field google">
+                    <a href="{% provider_login_url 'google' method='oauth2' next='/index/' %}" class="field google">
                         <img src="{% static 'img/login/google.png' %}" alt="" class="google-img">
                         <span>Login with Google</span>
                     </a>
