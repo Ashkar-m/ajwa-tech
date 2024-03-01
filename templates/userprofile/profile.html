@@ -81,7 +81,7 @@
                     </div>
 
                     <div class="col-sm-10 col-9 text-right m-b-30">
-                        <a href="" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Edit Profile</a>
+                        <a href="{% url 'editprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Edit Profile</a>
                     </div>
                 </div>
                 <div class="card-box profile-header">
@@ -104,19 +104,19 @@
                                         <div class="col-md-5">
                                             <div class="profile-info-left">
                                                 <h3 class="user-name m-t-0 mb-0">{{ users.name|upper }}</h3>
-                                                <small class="text-muted">Gynecologist</small>
-                                                <div class="staff-id">Employee ID : DR-0001</div>
+                                                <div class="staff-id"> <span class="title">Username:</span>
+                                                    <span class="text"><a href="#">{{ users.user.username }}</a></span></div>
                                             </div>
                                         </div>
                                         <div class="col-md-7">
                                             <ul class="personal-info">
                                                 <li>
                                                     <span class="title">Phone:</span>
-                                                    <span class="text"><a href="#">{{ users.mobile }}</a></span>
+                                                    <span class="text">{{ users.mobile }}</span>
                                                 </li>
                                                 <li>
                                                     <span class="title">Email:</span>
-                                                    <span class="text"><a href="#">{{ users.user.email }}</a></span>
+                                                    <span class="text">{{ users.user.email }}</span>
                                                 </li>
                                                 <li>
                                                     <span class="title">Birthday:</span>

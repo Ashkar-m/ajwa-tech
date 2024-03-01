@@ -21,16 +21,17 @@ def userProfile(request):
     return render(request,'userprofile/profile.html',context=context)
 
 def editProfile(request,pk):
-    user=UserModel.objects.get(pk=pk)
-    profile=UserProfile.objects.get(user=user.user)
-    address=address.objects.filter(address=profile.address)
-    if request.method=='POST':
-        name=request.POST.get('name')
-        mobile=request.POST.get('mobile')
-        gender=request.POST.get('gender')
-        dob=request.POST.get('dob')
-        address=request.POST.get('address')
-        profile=request.FILE.get('profile_pic')
+    users=UserModel.objects.get(pk=pk)
+    profile=UserProfile.objects.get(user_id=users.id)
+    
+    # if request.method=='POST':
+    #     name=request.POST.get('name')
+    #     mobile=request.POST.get('mobile')
+    #     gender=request.POST.get('gender')
+    #     dob=request.POST.get('dob')
+    #     address=request.POST.get('address')
+    #     profile=request.FILE.get('profile_pic')
 
-    context={'user':user,'profile':profile,'address':address}
-    return render(request,'userprofile/editprofile.html')
+
+    context={'users':users,'profile':profile}
+    return render(request,'userprofile/editprofile.html',context=context)
