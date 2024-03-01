@@ -20,7 +20,9 @@
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Categories</a>
                             <div class="dropdown-menu rounded-0 m-0">
                                 {% for category in categorys %}
+                                {% if category.delete_status != 0 %}
                                 <a href="{% url 'category' slug=category.slug %}" class="dropdown-item">{{ category.name }}</a>
+                                {% endif %}
                                 {% endfor %}
                             </div>
                         </div>

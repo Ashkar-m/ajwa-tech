@@ -29,47 +29,15 @@
     .page-wrapper > .content {
         padding: 30px;
     }
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px; /* Adjust padding as needed */
-    }
-    
-    .brand-title {
-        color: white;
-        font-size: 30px; /* Adjust font size as needed */
-    }
-    @media (min-width: 576px) and (max-width: 992px) {
-        .header-left {
-            order: 2;
-            text-align: center; /* Center the brand title */
-        }
-    
-        .mobile_btn {
-            order: 1;
-            margin-left: auto; /* Move the toggle button to the right */
-        }
-    
-        .user-menu {
-            display: none; /* Hide the user menu on medium screens */
-        }
-    
-        .mobile-user-menu {
-            display: block; /* Show the mobile user menu on medium screens */
-            margin-left: auto; /* Move the mobile user menu to the right */
-        }
-    }
 </style>
     
 </head>
 
 <body>
     <div class="main-wrapper">
-        <div class="header" style="background-color: #D19C97 ;">
+        <div class="header">
 			<div class="header-left">
-                <span class="brand-title">AJWA TECH</span>
-			</div>
+				</div>
 			<a id="mobile_btn" class="mobile_btn float-left" href=""><i class="fa fa-bars"></i></a>
             <ul class="nav user-menu float-right">
                 <li class="nav-item dropdown d-none d-sm-block">
@@ -113,10 +81,7 @@
                     </div>
 
                     <div class="col-sm-10 col-9 text-right m-b-30">
-                        {% if users.id %}
                         <a href="{% url 'editprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Edit Profile</a>
-                        {% endif %}
-                        <a href="{% url 'addprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Add Profile</a>
                     </div>
                 </div>
                 <div class="card-box profile-header">

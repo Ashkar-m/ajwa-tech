@@ -70,17 +70,12 @@ def userReg(request):
     if request.user.is_authenticated:
         return redirect('index')
 
-    # for otp expiry
-    # otp_expiry_time = timedelta(minutes=10)
-
     try:
         if request.method=='POST':
             otp = random.randint(100000, 999999)
             request.session['otp'] = otp
             request.session['otp_timestamp'] = str(timezone.now())
 
-            # for otp expiry
-            # request.session['otp_expiry'] = str(timezone.now() + otp_expiry_time)
             otp_expiry_time = 600
             request.session['otp_expiry'] = str(timezone.now() + timedelta(seconds=otp_expiry_time))
 
@@ -134,20 +129,15 @@ def otp(request,pk):
         return redirect('index')
     if request.method == "POST":
         try:
-            # profile = get_object_or_404(UserProfile, pk=pk)
             profile = get_object_or_404(User, pk=pk)
             verification=get_object_or_404(UserModel, user__pk=pk)
-
-            # otp_expiry = timezone.make_aware(datetime.strptime(request.session['otp_expiry'], "%Y-%m-%d %H:%M:%S.%f%z"))
-            # if timezone.now() > otp_expiry:
-            #     messages.error(request, 'OTP has expired. Please resend OTP.')
-            #     return redirect('resend_otp', pk=pk)
 
             if 'otp_expiry' in request.session:
                 otp_expiry_str = request.session['otp_expiry']
                 otp_expiry = datetime.fromisoformat(otp_expiry_str)
                 if timezone.now() > otp_expiry:
                     messages.error(request, 'OTP has expired. Please resend OTP.')
+                    return redirect(request.path)
 
 
             # Check if the 'can_otp_enter' cookie is set
@@ -181,14 +171,15 @@ def otp(request,pk):
                         return HttpResponse("User not verified.")
                 else:
                     messages.error(request,"Wrong otp entered....")
-            else:       
-                messages.error(request, 'Your otp time is expired. Try again')
-                return redirect(request.path)  # Redirect to the same page on OTP failure
+            # else:       
+            #     messages.error(request, 'Your otp time is expired. Try again')
 
         except MultipleObjectsReturned:
                 # Handle the case where more than one object is returned
             messages.error(request, 'Error: Multiple accounts found.')
             return redirect(register)  # Redirect to an error page or handle it appropriately
+        except Exception as e:
+            messages.error(request,f'Error :{e}')
 
     return render(request, "account/verify.html", {'id':pk})
 # ... (your other imports)
@@ -223,9 +214,6 @@ def resendOtp(request, pk):
             otp_expiry_time=600
             request.session['otp_expiry'] = str(timezone.now() + timedelta(seconds=otp_expiry_time))
 
-
-            # for otp expiry
-            # request.session['otp_expiry'] = str(timezone.now() + otp_expiry_time)
 
             send_mail("User Date: ", f"Verify your mail by OTP: {new_otp}", settings.EMAIL_HOST_USER, [email.email], fail_silently=False)
 

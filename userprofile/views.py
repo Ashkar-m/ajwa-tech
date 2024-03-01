@@ -1,8 +1,15 @@
 from django.shortcuts import render,get_object_or_404
 from . models import *
 from user.models import UserModel
+
+from django.views.decorators.cache import cache_control
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
+from django.contrib import messages
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def userProfile(request):
     try:
         
@@ -20,9 +27,29 @@ def userProfile(request):
     
     return render(request,'userprofile/profile.html',context=context)
 
-def editProfile(request,pk):
+def addProfile(request,pk):
     users=UserModel.objects.get(pk=pk)
     profile=UserProfile.objects.get(user_id=users.id)
+    
+    # if request.method=='POST':
+    #     name=request.POST.get('name')
+    #     mobile=request.POST.get('mobile')
+    #     gender=request.POST.get('gender')
+    #     dob=request.POST.get('dob')
+    #     address=request.POST.get('address')
+    #     profile=request.FILE.get('profile_pic')
+
+
+    context={'users':users,'profile':profile}
+    return render(request,'userprofile/addprofile.html',context=context)
+
+def editProfile(request,pk):
+    users=UserModel.objects.get(pk=pk)
+    try:
+        profile=UserProfile.objects.get(user_id=users.id)
+    except UserProfile.DoesNotExist:
+        profile=None
+        messages.error(request,"You need to Add profile first.")
     
     # if request.method=='POST':
     #     name=request.POST.get('name')
