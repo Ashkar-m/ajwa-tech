@@ -31,7 +31,7 @@
                                 <th>Category Image</th>
                                 <th>Category Status</th>
                                 <th>Edit</th>
-                                <th>Delete</th>
+                                <th>Unlist</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,12 +43,12 @@
                                 <td><img width="40" height="40" src="{{ category.image.url }}" class=" m-r-5" alt="">{{ category.image }}</td>
                                 {% endif %}
                                 <td> {% if category.delete_status == 1 %}
-                                    Live
+                                    List
                                 {% elif category.delete_status == 0 %}
-                                    Delete
+                                    Unlist
                                 {% endif %}</td>
                                 <td ><a href="{% url 'editcategory' pk=category.pk %}" class="text-success" style="text-decoration: none;">Edit</a> </td>
-                                <td ><a href="{% url 'deletecategory' pk=category.pk %}" class="text-danger" style="text-decoration: none;"> Delete</a></td>
+                                <td ><a href="{% url 'deletecategory' pk=category.pk %}" class="text-danger" style="text-decoration: none;"> Unlist</a></td>
                                 
                             </tr>
                             {% endfor %}

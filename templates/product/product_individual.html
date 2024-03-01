@@ -65,7 +65,14 @@
                 <small class="pt-1">(50 Reviews)</small>
             </div>
             <h3 class="font-weight-semi-bold mb-4">{{ product.price }}</h3>
-            <p class="mb-4">{{ product.description }}</p>
+            {% for part in product_description %}
+                        <ul>
+                            {% if not loop.last %}
+                            <li>{{ part }}.</li>
+                            {% endif %}
+                        </ul>
+                        
+                    {% endfor %}
             {% if product.delete_status == 0 %}
                 <h3 class="font-weight-semi-bold mb-4">Product Unavailable</h3>
             {% elif product.available %}
@@ -101,7 +108,14 @@
             <div class="tab-content">
                 <div class="tab-pane fade" id="tab-pane-1">
                     <h4 class="mb-3">Product Description</h4>
-                    {{ product.description }}
+                    {% for part in product_description %}
+                        <ul>
+                            {% if not loop.last %}
+                            <li>{{ part }}.</li>
+                            {% endif %}
+                        </ul>
+                        
+                    {% endfor %}
                     </div>
                 
                 <div class="tab-pane fade active show" id="tab-pane-3">
@@ -196,6 +210,8 @@
         document.getElementById('mainImage').src = imageSrc;
     }
     </script>
+
+   
     
     
 

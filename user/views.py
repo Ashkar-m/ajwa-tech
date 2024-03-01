@@ -37,17 +37,25 @@ def userLog(request):
     if request.method=='POST':
         username=request.POST.get('username')
         password=request.POST.get('password')
+        if not username or not password:
+                messages.error(request, "Please fill in all required fields.")
+                return render(request, 'account/login.html')
+
         user=authenticate(username=username,password=password)
         if user:
             if not (user.is_superuser and user.is_staff):
                 user_model = UserModel.objects.get(user=user)
 
+                if user_model.is_blocked:
+                    messages.error(request,"You are blocked!!.Please contact support for assitance.")
+                    return redirect(request.path)
+                    
                 if user_model.is_verified:
                     login(request,user)
                     messages.success(request, 'Login successful.')
                     return redirect('index')
                 else:
-                    messages.error(request,"You are blocked or You are not verified!!.Please contact support for assitance.")
+                    messages.error(request,"You are not verified!!.Please contact support for assitance.")
             else:
                 messages.error(request, "Admin are not allowed to login through this page.")
         else:
@@ -81,6 +89,11 @@ def userReg(request):
             password=request.POST.get('password')
             mobile=request.POST.get('mobile')
 
+            # Perform your form validation here
+            if not username or not email or not password or not mobile:
+                messages.error(request, "Please fill in all required fields.")
+                return render(request, 'account/register.html')
+
             if User.objects.filter(username=username).exists():
                 messages.error(request, "Username exists. Please choose a different one.")
                 return render(request, 'account/register.html')
@@ -91,11 +104,6 @@ def userReg(request):
 
             if UserModel.objects.filter(mobile=mobile).exists():
                 messages.error(request, "Mobile number already exists. Please choose a different one.")
-                return render(request, 'account/register.html')
-
-            # Perform your form validation here
-            if not username or not email or not password or not mobile:
-                messages.error(request, "Please fill in all required fields.")
                 return render(request, 'account/register.html')
 
             hashed_password = make_password(password)
@@ -172,7 +180,7 @@ def otp(request,pk):
                         messages.error(request, 'User not verified.')
                         return HttpResponse("User not verified.")
                 else:
-                    messages.error(request,"wrong otp entered")
+                    messages.error(request,"Wrong otp entered....")
             else:       
                 messages.error(request, 'Your otp time is expired. Try again')
                 return redirect(request.path)  # Redirect to the same page on OTP failure

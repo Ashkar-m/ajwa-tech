@@ -22,10 +22,6 @@
             <span class="navbar-title">AJWA TECH</span>
         </nav>
 
-    
-
-
-
         <section class="container forms">
             <div class="form login">
                 <div class="form-content">
@@ -38,11 +34,11 @@
                         </div>
                         {% endfor %}
                         <div class="field input-field">
-                            <input name="username" required type="text" placeholder="Username" class="input">
+                            <input name="username" type="text" placeholder="Username" class="input">
                         </div>
 
                         <div class="field input-field">
-                            <input name="password" required type="password" placeholder="Password" class="password">
+                            <input name="password" type="password" placeholder="Password" class="password">
                             <i class='bx bx-hide eye-icon'></i>
                         </div>
 
@@ -81,12 +77,16 @@
            
         </section>
 
+        
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
         <!-- JavaScript -->
         <script src="{% static '/js/login/script.js' %}"></script>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
         <script >
             $().ready(function () {
 
@@ -116,10 +116,28 @@
                         password: {
                             required: " Please enter a password",
                             minlength:" Your password must be consist of at least 6 characters",
-                            strongPassword:" Your password is weak",
+                            strongPassword:"Please enter valid password",
                         },
-                    }
+                    },
+                    
                 });
+                $.validator.addMethod(
+                    "validUsername",
+                    function (value, element) {
+                        // Use a regular expression to check for valid username
+                        return /^[a-zA-Z]+(?:[a-zA-Z0-9]*[0-9])?$/.test(value);
+                    },
+                    " Please enter a valid username without special characters"
+                );
+                $.validator.addMethod(
+                    "strongPassword",
+                    function (value, element) {
+                        // Use a regular expression to check for valid username
+                        return /^[a-zA-Z0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\-]{6,}$/.test(value);
+                    },
+                    " Please enter a valid password"
+                );
+
                 
             });
         </script>

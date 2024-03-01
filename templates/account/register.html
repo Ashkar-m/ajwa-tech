@@ -153,6 +153,14 @@
             },
             "Please enter a valid 10-digit Indian mobile number"
             );
+            $.validator.addMethod(
+                "strongPassword",
+                function (value, element) {
+                    // Use a regular expression to check for a strong password
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]+$/.test(value);
+                },
+                "Your password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character"
+            );
             
         });
     </script>

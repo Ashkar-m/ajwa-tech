@@ -39,14 +39,14 @@
                                 <select class="form-control" name="product_category">
                                     <option value="{{ product.category }}" selected>{{ product.category }}</option>
                                         
-                                    {% for category in categorys %}
+                                    {% for category in cat %}
                                         {% if category.delete_status != 0%}
-                                            {% if product.category != category.name %}
+                                            {% if category.name %}
                                                 <option value="{{ category.name }}">{{ category.name }}</option>
                                             {% endif %}
                                         {% endif %}
                                     {% endfor %}
-                                    <!-- Add more categories as needed -->
+                                    
                                 </select>
                             </div>
                         </div>
@@ -73,7 +73,8 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Description</label>
-                                        <input type="text" class="form-control " name="product_description" value="{{ product.description }}" required>
+                                        <textarea class="form-control" name="product_description" placeholder="Please write product descritpion with ;(semi-colon) separated.(End of one semicolon is a statement).No need to write semicolon in last statement.">{{ product.description }}</textarea>
+                                        <!-- <input type="text" class="form-control " name="product_description"  required> -->
                                     </div>
                                 </div>
                                 
@@ -163,10 +164,18 @@
             function (value, element) {
                 // Add your custom validation logic for product description
                 // You can adjust this according to your requirements
-                return /^[a-zA-Z0-9\s.,!?()-]+$/i.test(value);
+                return /^(?!\.+$)(?=.*[^\s])[^]*$/.test(value);
             },
             "Please enter a valid product description."
         );
+        $("#product_stock").on("input", function () {
+            var stockValue = parseInt($(this).val());
+            var isAvailableCheckbox = $("#product_available");
+
+            // Update the isAvailable checkbox based on the stock value
+            isAvailableCheckbox.prop("checked", stockValue > 0);
+        });
+
     });
 </script>
 <script>

@@ -24,6 +24,7 @@ urlpatterns = [
     path('',include('user.urls')),
     path('',include('product.urls')),
     path('adminUser/',include('adminuser.urls')),
+    path('userProfile/',include('userprofile.urls')),
     path('accounts/', include('allauth.urls')),
 ]
 

@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect
 from django.views.decorators.cache import cache_control
 from . models import *
+from user.models import *
 from django.shortcuts import get_object_or_404
 
 from django.db.models import Count
@@ -46,8 +47,9 @@ def detail(request,slug):
     product=Product.objects.get(slug=slug)
     category=product.category
     related_product=Product.objects.filter(category=category).exclude(slug=slug)
+    product_description_split = product.description.split(';')
     category_list=Category.objects.all()
-    context={'product':product,'related_products':related_product,'categorys':category_list}
+    context={'product':product,'related_products':related_product,'categorys':category_list,'product_description':product_description_split}
     return render(request,'product/product_individual.html',context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

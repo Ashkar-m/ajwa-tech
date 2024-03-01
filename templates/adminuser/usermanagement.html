@@ -28,6 +28,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>verified</th>
+                                <th>Blocked</th>
                                 <th class="text-right">Block/Unblock</th>
                             </tr>
                         </thead>
@@ -39,6 +40,7 @@
                                 <td>{{ user.user.username }}</td>
                                 <td>{{ user.user.email }}</td>
                                 <td>{{ user.is_verified }}</td>
+                                <td>{{ user.is_blocked }}</td>
                                 <td class="text-right">
                                             <a href="{% url 'blockuser' pk=user.id %}" class="text-success" style="text-decoration: none;">Block</a>/
                                             <a href="{% url 'unblockuser' pk=user.id %}" class="text-danger" style="text-decoration: none;"> Unblock</a>
@@ -47,6 +49,39 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    <span class="step-links">
+                        <span class="current">
+                            Page {{ users.number }} of {{ users.paginator.num_pages }}.
+                        </span>
+                        {% if users.has_previous %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if users.number == 1 %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.paginator.num_pages }}">last &raquo;</a></li>
+                                {% elif users.number == users.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}">previous</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}">previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                        
+                        {% if users.has_next %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if users.number == users.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.previous_page_number }}">previous</a></li>
+                                {% elif not users.has_previous %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ users.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </span>
+                    
                 </div>
             </div>
         </div>

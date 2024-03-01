@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'user',
     'product',
     'adminuser',
+    'userprofile',
     
 
 
@@ -181,7 +182,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL='/index/'
 
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/index/'
+ACCOUNT_LOGIN_REDIRECT_URL = '/index/'
 
 
 # to send otp

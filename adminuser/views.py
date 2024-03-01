@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminLogin(request):
@@ -45,15 +47,41 @@ def adminHome(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminUsermng(request):
-    user_data=UserModel.objects.all()
-    context={'users':user_data}
+    user_data=UserModel.objects.all().order_by('pk')
+   
+    records_per_page = 10
+    paginator = Paginator(user_data, records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        users = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        users = paginator.page(paginator.num_pages)
+    context={'users':users}
     return render(request,'adminuser/usermanagement.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminProductmng(request):
-    product_data=Product.objects.all()
-    context={'products':product_data}
+    product_data=Product.objects.all().order_by('id')
+    records_per_page = 10
+    paginator = Paginator( product_data, records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        products = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        products = paginator.page(paginator.num_pages)
+        
+    context={'products':products}
     return render(request,'adminuser/productmanagement.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -114,7 +142,7 @@ def deleteProduct(request,pk):
             product.save()
             messages.success(request,"Product deleted successfully.")
         else:
-            messages.error(request,"Product doesn't Exists..")
+            messages.error(request,"Product already unlisted.")
     except Exception as e:
         messages.error(request, f"Error deleting product: {e}")
     product_list=Product.objects.all()
@@ -155,7 +183,7 @@ def deleteCategory(request,pk):
             category.save()
             messages.success(request,"Successfully Deleted category..")
         else:
-            messages.error(request,"Category doesn't Exists.")
+            messages.error(request,"Category already unlisted.")
     except Exception as e:
         messages.error(request, f"Error deleting categories: {e}")
     category_list=Category.objects.all()
@@ -167,6 +195,7 @@ def deleteCategory(request,pk):
 def editProduct(request,pk):
     product=Product.objects.get(pk=pk)
     category_list=Category.objects.all()
+    category_exclude=Category.objects.exclude(name=product.category)
 
     if request.method == 'POST':
         # Retrieve form data
@@ -204,7 +233,7 @@ def editProduct(request,pk):
             messages.error(request, f"Error deleting categories: {e}")
 
 
-    context={'product':product,'categorys':category_list}
+    context={'product':product,'categorys':category_list,'cat':category_exclude}
     return render(request,'adminuser/editproduct.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -267,8 +296,8 @@ def deleteProductImage(request,pk):
 def blockUser(request,pk):
     block_user=UserModel.objects.get(pk=pk)
     try:
-        if block_user.is_verified==True:
-            block_user.is_verified=False
+        if block_user.is_blocked==False:
+            block_user.is_blocked=True
             block_user.save()
             messages.success(request,"Successfully blocked the user..")
         else:
@@ -285,8 +314,8 @@ def blockUser(request,pk):
 def unblockUser(request,pk):
     block_user=UserModel.objects.get(pk=pk)
     try:
-        if block_user.is_verified==False:
-            block_user.is_verified=True
+        if block_user.is_blocked==True:
+            block_user.is_blocked=False
             block_user.save()
             messages.success(request,"Successfully Unblocked the user..")
         else:
@@ -302,5 +331,5 @@ def unblockUser(request,pk):
 @login_required(login_url='adminlog')
 def adminlogout(request):
     logout(request)
-    messages.success("Admin Logout successfully.")
+    messages.success(request,"Admin Logout successfully.")
     return redirect(adminLogin)

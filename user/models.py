@@ -11,6 +11,7 @@ class UserModel(models.Model):
     user=models.OneToOneField(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,related_name='usermodel')
     mobile=models.CharField(max_length=10)
     is_verified=models.BooleanField(default=False)
+    is_blocked=models.BooleanField(default=False)
     delete_status=models.IntegerField(choices=Delete_choice,default=LIVE)
     created_at=models.DateField(auto_now_add=True)
     updated_at=models.DateField(auto_now=True)

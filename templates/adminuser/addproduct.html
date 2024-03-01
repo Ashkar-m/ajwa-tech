@@ -72,7 +72,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Description</label>
-                                        <input type="text" class="form-control " name="product_description">
+                                        <textarea class="form-control" name="product_description" placeholder="Please write product descritpion with ;(semi-colon) separated.(End of one semicolon is a statement).No need to write semicolon in last statement."></textarea>
                                     </div>
                                 </div>
                                 
@@ -169,7 +169,7 @@
             function (value, element) {
                 // Add your custom validation logic for product description
                 // You can adjust this according to your requirements
-                return /^[a-zA-Z0-9\s.,!?()-]+$/i.test(value);
+                return /^(?!\.+$)(?=.*[^\s])[^]*$/.test(value);
             },
             "Please enter a valid product description."
         );
@@ -190,4 +190,5 @@
         });
     });
 </script>
+
 {% endblock %}
