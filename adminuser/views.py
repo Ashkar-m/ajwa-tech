@@ -104,6 +104,9 @@ def adminAddProduct(request):
 
         try:
             if product_category:
+                if Product.objects.filter(name=product_name).exists():
+                    messages.error(request, "product already exists. Please choose a different one.")
+                    return redirect(request.path)
                 # get the category object
                 category=Category.objects.get(name=product_category)
                 # Create a new Product instance
