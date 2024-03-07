@@ -16,6 +16,8 @@ from django.views.decorators.cache import cache_control
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
+from django.db.models import F, Case, When, Value, CharField
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminLogin(request):
@@ -67,7 +69,15 @@ def adminUsermng(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminProductmng(request):
-    product_data=Product.objects.all().order_by('id')
+    product_data=Product.objects.all().annotate(
+        latest_timestamp=Case(
+            When(updated_at__gt=F('created_at'), then=F('updated_at')),
+            default=F('created_at'),
+            output_field=CharField()
+        )
+    ).order_by('-latest_timestamp')
+
+
     records_per_page = 10
     paginator = Paginator( product_data, records_per_page)
 
@@ -141,7 +151,7 @@ def deleteProduct(request,pk):
         if product.delete_status==Product.LIVE:
             product.delete_status=Product.DELETE
             product.save()
-            messages.success(request,"Product deleted successfully.")
+            messages.success(request,"Product unlisted successfully.")
         else:
             messages.error(request,"Product already unlisted.")
     except Exception as e:
@@ -149,6 +159,24 @@ def deleteProduct(request,pk):
     product_list=Product.objects.all()
     context={'products':product_list}
     return render(request,'adminuser/productmanagement.html',context=context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='adminlog')
+def undodeleteProduct(request,pk):
+    product=Product.objects.get(pk=pk)
+    try:
+        if product.delete_status==Product.DELETE:
+            product.delete_status=Product.LIVE
+            product.save()
+            messages.success(request,"Product Listed successfully.")
+        else:
+            messages.error(request,"Product already listed.")
+    except Exception as e:
+        messages.error(request, f"Error deleting product: {e}")
+    product_list=Product.objects.all()
+    context={'products':product_list}
+    return render(request,'adminuser/productmanagement.html',context=context)
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
@@ -182,7 +210,7 @@ def deleteCategory(request,pk):
         if category.delete_status==Category.LIVE:
             category.delete_status=Category.DELETE
             category.save()
-            messages.success(request,"Successfully Deleted category..")
+            messages.success(request,"Successfully Unlisted category..")
         else:
             messages.error(request,"Category already unlisted.")
     except Exception as e:
@@ -190,6 +218,22 @@ def deleteCategory(request,pk):
     category_list=Category.objects.all()
     context={'categorys':category_list}
     return render(request,'adminuser/categorymanagement.html',context=context)
+
+def undodeleteCategory(request,pk):
+    category=Category.objects.get(pk=pk)
+    try:
+        if category.delete_status==Category.DELETE:
+            category.delete_status=Category.LIVE
+            category.save()
+            messages.success(request,"Successfully Listed category..")
+        else:
+            messages.error(request,"Category already listed.")
+    except Exception as e:
+        messages.error(request, f"Error : {e}")
+    category_list=Category.objects.all()
+    context={'categorys':category_list}
+    return render(request,'adminuser/categorymanagement.html',context=context)
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')

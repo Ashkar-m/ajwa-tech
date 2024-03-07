@@ -73,7 +73,7 @@
                         </ul>
                         
                     {% endfor %}
-            {% if product.delete_status == 0 %}
+            {% if product.delete_status == 0 or product.category.delete_status == 0 %}
                 <h3 class="font-weight-semi-bold mb-4">Product Unavailable</h3>
             {% elif product.available %}
             <div class="d-flex align-items-center mb-4 pt-2">
@@ -90,7 +90,7 @@
                         </button>
                     </div>
                 </div>
-                <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                <a href="{% url 'addtocart' product_id=product.id %}"><button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button></a>
             </div>
             {% else %}
             <h3 class="font-weight-semi-bold mb-4">Out of stock</h3>

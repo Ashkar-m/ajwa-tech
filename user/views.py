@@ -76,7 +76,7 @@ def userReg(request):
             request.session['otp'] = otp
             request.session['otp_timestamp'] = str(timezone.now())
 
-            otp_expiry_time = 180
+            otp_expiry_time = 600
             request.session['otp_expiry'] = str(timezone.now() + timedelta(seconds=otp_expiry_time))
 
             username=request.POST.get('username')
@@ -114,7 +114,7 @@ def userReg(request):
             send_mail("User Date: ", f"Verify your mail by OTP: {otp}", settings.EMAIL_HOST_USER, [email], fail_silently=False)
 
             red=redirect(f'/otp/{user.pk}/')
-            red.set_cookie("can_otp_enter",True,max_age=180)
+            red.set_cookie("can_otp_enter",True,max_age=600)
             return red
             
     except Exception as e:

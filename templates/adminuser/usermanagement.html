@@ -42,8 +42,11 @@
                                 <td>{{ user.is_verified }}</td>
                                 <td>{{ user.is_blocked }}</td>
                                 <td class="text-right">
-                                            <a href="{% url 'blockuser' pk=user.id %}" class="text-success" style="text-decoration: none;">Block</a>/
+                                            {% if user.is_blocked == False %}
+                                            <a href="{% url 'blockuser' pk=user.id %}" class="text-success" style="text-decoration: none;">Block</a>
+                                            {% else %}
                                             <a href="{% url 'unblockuser' pk=user.id %}" class="text-danger" style="text-decoration: none;"> Unblock</a>
+                                            {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}

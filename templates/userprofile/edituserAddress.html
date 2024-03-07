@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- profile22:59-->
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'css/adminuser/assets//img/favicon.ico">
+    <title>AJWA TECH|userprofile</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/font-awesome.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/style.css' %}">
+<style>
+    .page-wrapper {
+        left: 0;
+        margin-left: 60px;
+        padding-top: 50px;
+        position: relative;
+        -webkit-transition: all 0.4s ease;
+        -moz-transition: all 0.4s ease;
+        transition: all 0.4s ease;
+    }
+    .page-wrapper > .content {
+        padding: 30px;
+    }
+</style>
+    
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="header">
+			<div class="header-left">
+				</div>
+			<a id="mobile_btn" class="mobile_btn float-left" href=""><i class="fa fa-bars"></i></a>
+            <ul class="nav user-menu float-right">
+                <li class="nav-item dropdown d-none d-sm-block">
+                    </li>
+                <li class="nav-item dropdown d-none d-sm-block">
+                    </li>
+                <li class="nav-item dropdown has-arrow">
+                    <a href="#" class="dropdown-toggle nav-link user-link" data-toggle="dropdown">
+                        <span class="user-img"><img class="rounded-circle" src="{% static 'css/adminuser/assets//img/user.jpg' %}" width="40" alt="Admin">
+							
+                            <span class="status online"></span>
+                            
+                        </span>
+                        <span>User</span>
+                    </a>
+					<div class="dropdown-menu">
+                        <a class="dropdown-item" href="{% url 'index' %}">Home</a>
+						<a class="dropdown-item" href="">View Profile</a>
+						
+                        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                        
+					</div>
+                </li>
+            </ul>
+            <div class="dropdown mobile-user-menu float-right">
+                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="{% url 'index' %}">Home</a>
+                    <a class="dropdown-item" href="">View Profile</a>
+                    
+                    <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="page-wrapper">
+            <div class="content">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="page-title">Edit Profile</h4>
+                    </div>
+                </div>
+                <form method="post" id="edituserAddress">
+                    {% csrf_token %}
+                    {% for message in messages %}
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    <div class="card-box">
+                        <h3 class="card-title">Primary Address:</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">Address</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter Your street address" value="{{ address.street_address }}" name="street_address">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">City</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter your city or town" value="{{ address.city }}" name="city">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">District</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter your district" value="{{ address.district }}" name="district">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">State</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter your state" value="{{ address.state }}" name="state">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">Country</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter your country" value="{{ address.country }}" name="country">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-focus focused">
+                                    <label class="focus-label">Zip code</label>
+                                    <input type="text" class="form-control floating" placeholder="Enter your zip code" value="{{ address.zip_code }}" name="zip_code">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group form-focus focused">
+                                    <label>
+                                    Primary Address:&nbsp;&nbsp;
+                                    <input type="checkbox" class="" name="is_primary" >
+                                </label>
+                                </div>
+                            </div>
+
+                            <div class="add-more">
+                                <a href="" class="btn btn-primary"><i class="fa fa-plus"></i> Add More Address </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center m-t-20">
+                        <button class="btn btn-primary submit-btn" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+            <div class="notification-box">
+                <div class="msg-sidebar notifications msg-noti">
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-overlay" data-reff=""></div>
+    <script src="{% static 'css/adminuser/assets//js/jquery-3.2.1.min.js' %}"></script>
+	<script src="{% static 'css/adminuser/assets//js/popper.min.js' %}"></script>
+    <script src="{% static 'css/adminuser/assets//js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'css/adminuser/assets//js/jquery.slimscroll.js' %}"></script>
+    <script src="{% static 'css/adminuser/assets//js/app.js' %}"></script>
+</body>
+
+
+<!-- profile23:03-->
+</html>

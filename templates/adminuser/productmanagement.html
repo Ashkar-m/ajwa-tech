@@ -34,11 +34,12 @@
                                 <th>Stock</th>
                                 <th>Product Image</th>
                                 <th>Product Status</th>
-                                <th >Edit/Unlist</th>
+                                <th >Edit</th>
+                                <th>List/unlist</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for product in products|dictsort:"id" %}
+                            {% for product in products %}
                             <tr>
                                 <td>{{ product.id }}</td>
                                 <td>{{ product.name }}</td>
@@ -53,9 +54,14 @@
                                     Unlist
                                 {% endif %}</td>
                                 <td class="text-right">
-                                            <a href="{% url 'editproduct' pk=product.pk %}" class="text-success" style="text-decoration: none;">Edit</a>/
-                                            <a href="{% url 'deleteproduct' pk=product.pk %}" class="text-danger" style="text-decoration: none;"> Unlist</a>
+                                            <a href="{% url 'editproduct' pk=product.pk %}" class="text-success" style="text-decoration: none;">Edit</a>
                                 </td>
+                                <td>
+                                    {% if product.delete_status == 1 %}
+                                    <a href="{% url 'deleteproduct' pk=product.pk %}" class="text-danger" style="text-decoration: none;"> Unlist</a></td>
+                                    {% else %}
+                                    <a href="{% url 'undodeleteproduct' pk=product.pk %}" class="text-danger" style="text-decoration: none;"> List</a></td>
+                                    {% endif %}
                             </tr>
                             {% endfor %}
                         </tbody>

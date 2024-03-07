@@ -116,7 +116,7 @@
                         {% if users.id %}
                         <a href="{% url 'editprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Edit Profile</a>
                         {% endif %}
-                        <a href="{% url 'addprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Add Profile</a>
+                        <a href="{% url 'addprofile' %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Add Profile</a>
                     </div>
                 </div>
                 <div class="card-box profile-header">
@@ -138,9 +138,11 @@
                                     <div class="row">
                                         <div class="col-md-5">
                                             <div class="profile-info-left">
+                                                {% if users.name %}
                                                 <h3 class="user-name m-t-0 mb-0">{{ users.name|upper }}</h3>
                                                 <div class="staff-id"> <span class="title">Username:</span>
                                                     <span class="text"><a href="#">{{ users.user.username }}</a></span></div>
+                                                
                                             </div>
                                         </div>
                                         <div class="col-md-7">
@@ -153,6 +155,7 @@
                                                     <span class="title">Email:</span>
                                                     <span class="text">{{ users.user.email }}</span>
                                                 </li>
+                                                {% endif %}
                                                 <li>
                                                     <span class="title">Birthday:</span>
                                                     {% if profile.birthdate %}
@@ -163,9 +166,14 @@
                                                 </li>
                                                 <li>
                                                     <span class="title">Address:</span>
-                                                    {% if profile.address %}
-                                                    <span class="text">{{ address.street_address }},{{ address.city }},{{ address.state }},{{ address.zip_code }}</span>
+                                                    {% for address in address_data %}
+                                                    {% if address.is_primary %}
+                                                    <span class="text">{{ address.street_address }},{{ address.city }},{{ address.district }},{{ address.state }},{{ address.zip_code }}</span>
                                                     {% else %}
+                                                    <br>
+                                                    {% endif %}
+                                                    {% endfor %}
+                                                    {% if not profile.address %}
                                                     <br>
                                                     {% endif %}
                                                 </li>

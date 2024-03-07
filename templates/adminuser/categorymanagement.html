@@ -31,7 +31,7 @@
                                 <th>Category Image</th>
                                 <th>Category Status</th>
                                 <th>Edit</th>
-                                <th>Unlist</th>
+                                <th>List/Unlist</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,7 +48,11 @@
                                     Unlist
                                 {% endif %}</td>
                                 <td ><a href="{% url 'editcategory' pk=category.pk %}" class="text-success" style="text-decoration: none;">Edit</a> </td>
+                                {% if category.delete_status == 1 %}
                                 <td ><a href="{% url 'deletecategory' pk=category.pk %}" class="text-danger" style="text-decoration: none;"> Unlist</a></td>
+                                {% else %}
+                                <td ><a href="{% url 'undodeletecategory' pk=category.pk %}" class="text-danger" style="text-decoration: none;">List</a></td>
+                                {% endif %}
                                 
                             </tr>
                             {% endfor %}
