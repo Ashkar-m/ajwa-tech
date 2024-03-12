@@ -15,7 +15,7 @@ class Cart(models.Model):
 class CartItem(models.Model):
     cart=models.ForeignKey(Cart, on_delete=models.CASCADE,related_name='cartItem')
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='productItem')
-    quantity= models.PositiveIntegerField(default=1)
+    quantity= models.PositiveIntegerField(default=0)
     is_active= models.BooleanField(default=True)
     subtotal = models.IntegerField(null=True,blank=True)
 
@@ -37,7 +37,7 @@ class Order(models.Model):
                     (COD,'Cod'),
                     (UPI,'Upi'),
                     )
-    payment_method=models.IntegerField(choices=payment_choice)
+    payment_method=models.IntegerField(choices=payment_choice,null=True)
     PAYMENT_PENDING=0
     PAYMENT_COMPLETED=1
     PAYMENT_FAILED=2

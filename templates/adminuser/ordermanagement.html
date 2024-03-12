@@ -1,0 +1,124 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-sm-4 col-3">
+                <h4 class="page-title">Orders</h4>
+            </div>
+            <div class="col-sm-8 col-9 text-right m-b-20">
+                <!-- <a href="{% url 'addproduct' %}" class="btn btn btn-primary btn-rounded float-right"><i class="fa fa-plus"></i> Add Product</a> -->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-border table-striped custom-table datatable mb-0">
+                        <thead>
+                            <tr>
+                                <th>Transaction id</th>
+                                <th>Order Status</th>
+                                <th>Payment Method</th>
+                                <th>Payment Status</th>
+                                <th>Date ordered</th>
+                                <th>Cancel</th>
+                                <th>Total Price</th>
+                                <!-- <th>Address</th> -->
+                                <th>Customer</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.transaction_id }}</td>
+                                <td>{% if order.Order_status == 0 %} Pending
+                                    {% elif order.Order_status == 1 %}Shipped
+                                    {% elif order.Order_status == 2 %}Delivery
+                                    {% elif order.Order_status == 3 %}Cancel
+                                    {% else %}Invalid
+                                    {%endif%}</td>
+                                <td>{% if order.payment_method == 0 %} Razorpay
+                                    {% elif order.payment_method == 1 %}Cash on Delivery
+                                    {% elif order.payment_method == 2 %}UPI
+                                    {% else %}Invalid
+                                    {%endif%}</td>
+                                <td>{% if order.payment_status == 0 %} Pending
+                                    {% elif order.payment_status == 1 %}Completed
+                                    {% elif order.payment_status == 2 %}Failed
+                                    {% else %}Invalid
+                                    {%endif%}</td>
+                                <td>{{ order.date_ordered }}</td>
+                                <td>{{ order.is_cancel }}</td>
+                                <td>{{ order.total_price }}</td>
+                                <!-- <td>{{ order.address }}</td> -->
+                                <td>{{ order.customer }}</td>
+                                <td><a href="{% url 'editorder' pk=order.pk %}" class="text-danger" style="text-decoration: none;">Edit</a></td></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- <span class="step-links">
+                        <span class="current">
+                            Page {{ orders.number }} of {{ orders.paginator.num_pages }}.
+                        </span>
+                        {% if orders.has_previous %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if orders.number == 1 %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}">last &raquo;</a></li>
+                                {% elif orders.number == orders.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">previous</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                        
+                        {% if orders.has_next %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if orders.number == orders.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}">previous</a></li>
+                                {% elif not orders.has_previous %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ orders.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

@@ -20,5 +20,8 @@ urlpatterns = [
     path('unblockuser/<pk>',views.unblockUser ,name='unblockuser'),
     path('adminout/',views.adminlogout ,name='adminout'),
     path('undodeletecategory/<pk>',views.undodeleteCategory ,name='undodeletecategory'),
+    path('ordermng/',views.adminOrdermng ,name='ordermng'),
+    path('editorder/<pk>', views.editOrder,name='editorder'),
+    path('cancelorder/<pk>',views.cancelOrder,name='cancelorder'),
     
 ]

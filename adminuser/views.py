@@ -18,6 +18,8 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from django.db.models import F, Case, When, Value, CharField
 
+from cart.models import *
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminLogin(request):
@@ -378,3 +380,100 @@ def adminlogout(request):
     logout(request)
     messages.success(request,"Admin Logout successfully.")
     return redirect(adminLogin)
+
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='adminlog')
+def adminOrdermng(request):
+    orders=Order.objects.filter(complete=True)
+    product_data=Product.objects.all().annotate(
+        latest_timestamp=Case(
+            When(updated_at__gt=F('created_at'), then=F('updated_at')),
+            default=F('created_at'),
+            output_field=CharField()
+        )
+    ).order_by('-latest_timestamp')
+
+
+    records_per_page = 10
+    paginator = Paginator( product_data, records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+        
+    context={'products':products,'orders':orders}
+    return render(request,'adminuser/ordermanagement.html',context=context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='adminlog')
+def editOrder(request,pk):
+    orders=Order.objects.get(pk=pk)
+    order_statuses=Order.objects.exclude(Order_status=orders.Order_status)
+    for i in order_statuses:
+        print(i.id)
+    payment_statuses=Order.objects.exclude(payment_status=orders.payment_status)
+    payment_methods=Order.objects.exclude(payment_method=orders.payment_method)
+    # category_list=Category.objects.all()
+    # category_exclude=Category.objects.exclude(name=product.category)
+
+    if request.method == 'POST':
+        # Retrieve form data
+        product_name = request.POST.get('product_name')
+        product_price = request.POST.get('product_price')
+        product_category = request.POST.get('product_category')
+        product_stock = request.POST.get('product_stock')
+        product_available = request.POST.get('product_available') == 'on'
+        product_priority = request.POST.get('product_priority')
+        product_description = request.POST.get('product_description')
+
+        try:
+            # Get the category object
+            category = Category.objects.get(name=product_category)
+
+            # Update the product instance
+            product.name = product_name
+            product.price = product_price
+            product.category = category
+            product.stock = product_stock
+            product.available = product_available
+            product.priority = product_priority
+            product.description = product_description
+
+            # Save the updated product
+            product.save()
+
+            messages.success(request, "Successfully updated product.")
+            return redirect(adminProductmng)
+        except Category.DoesNotExist:
+            messages.error(request, "Invalid category or category doesn't exist.")
+        except IntegrityError:
+            messages.error(request, "Product with this name already exists.")
+        except Exception as e:
+            messages.error(request, f"Error deleting categories: {e}")
+
+
+    context={'orders':orders,
+            'order_statuses':order_statuses,
+            'payment_methods':payment_methods,
+            'payment_statuses':payment_statuses,}
+    return render(request,'adminuser/editorder.html',context=context)
+
+def cancelOrder(request,pk):
+    cancel=Order.objects.get(pk=pk)
+    print(cancel.is_cancel)
+    try:
+        if cancel.is_cancel==False:
+            cancel.is_cancel=True
+            cancel.save()
+            messages.success(request,"Product cancel successful.")
+        else:
+            messages.error(request,"Product already cancelled.")
+    except Exception as e:
+        messages.error(request,f"Error:{e}")
+
+    return redirect('index')

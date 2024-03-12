@@ -13,27 +13,59 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/font-awesome.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/style.css' %}">
-<style>
-    .page-wrapper {
-        left: 0;
-        margin-left: 60px;
-        padding-top: 50px;
-        position: relative;
-        -webkit-transition: all 0.4s ease;
-        -moz-transition: all 0.4s ease;
-        transition: all 0.4s ease;
-    }
-    .page-wrapper > .content {
-        padding: 30px;
-    }
-</style>
+    <style>
+        .page-wrapper {
+            left: 0;
+            margin-left: 60px;
+            padding-top: 50px;
+            position: relative;
+            -webkit-transition: all 0.4s ease;
+            -moz-transition: all 0.4s ease;
+            transition: all 0.4s ease;
+        }
+        .page-wrapper > .content {
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px; /* Adjust padding as needed */
+        }
+        
+        .brand-title {
+            color: white;
+            font-size: 30px; /* Adjust font size as needed */
+        }
+        @media (min-width: 576px) and (max-width: 992px) {
+            .header-left {
+                order: 2;
+                text-align: center; /* Center the brand title */
+            }
+        
+            .mobile_btn {
+                order: 1;
+                margin-left: auto; /* Move the toggle button to the right */
+            }
+        
+            .user-menu {
+                display: none; /* Hide the user menu on medium screens */
+            }
+        
+            .mobile-user-menu {
+                display: block; /* Show the mobile user menu on medium screens */
+                margin-left: auto; /* Move the mobile user menu to the right */
+            }
+        }
+    </style>
     
 </head>
 
 <body>
     <div class="main-wrapper">
-        <div class="header">
+        <div class="header" style="background-color: #D19C97 ;">
 			<div class="header-left">
+                <span class="brand-title">AJWA TECH</span>
 				</div>
 			<a id="mobile_btn" class="mobile_btn float-left" href=""><i class="fa fa-bars"></i></a>
             <ul class="nav user-menu float-right">
@@ -52,7 +84,7 @@
                     </a>
 					<div class="dropdown-menu">
                         <a class="dropdown-item" href="{% url 'index' %}">Home</a>
-						<a class="dropdown-item" href="">View Profile</a>
+						<a class="dropdown-item" href="{% url 'userprofile' %}">User Profile</a>
 						
                         <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                         
@@ -63,7 +95,7 @@
                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{% url 'index' %}">Home</a>
-                    <a class="dropdown-item" href="">View Profile</a>
+                    <a class="dropdown-item" href="{% url 'userprofile' %}">User Profile</a>
                     
                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                     
@@ -127,14 +159,12 @@
                                 <div class="form-group form-focus focused">
                                     <label>
                                     Primary Address:&nbsp;&nbsp;
-                                    <input type="checkbox" class="" name="is_primary" >
+                                    <input type="checkbox" class="" name="is_primary" {% if address.is_primary %}checked{% endif %}>
                                 </label>
                                 </div>
                             </div>
 
-                            <div class="add-more">
-                                <a href="" class="btn btn-primary"><i class="fa fa-plus"></i> Add More Address </a>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="text-center m-t-20">
@@ -154,6 +184,115 @@
     <script src="{% static 'css/adminuser/assets//js/bootstrap.min.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/jquery.slimscroll.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/app.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <script>
+        $().ready(function () {
+            $("#edituserAddress").validate({
+                rules: {
+                    street_address: {
+                        required: true,
+                        validDescription: true,
+                    },
+                    city: {
+                        required: true,
+                        validProductName: true,
+                    },
+                    district: {
+                        required: true,
+                        validProductName: true,
+                    },
+                    state: {
+                        required: true,
+                        validProductName: true,
+                    },
+                    country: {
+                        required: true,
+                        validProductName:true,
+                    },
+                    zip_code:{
+                        required: true,
+                        validNumber: true,
+                    }
+                },
+                messages: {
+                    street_address: {
+                        required: "This is a required Field",
+                        validDescription: "Please enter a valid street address",
+                    },
+                    city: {
+                        required: "This is a required Field",
+                        validProductName:"please enter a valid city",
+                    },
+                    district: {
+                        required: "This is a required Field",
+                        validProductName:"please enter a valid district",
+                    },
+                    state: {
+                        required: "This is a required Field",
+                        validProductName:"please enter a valid state",
+                    },
+                    country: {
+                        required: "This is a required Field",
+                        validProductName:"please enter a valid country",
+                    },
+                    zip_code:{
+                        required: "please enter 6 digit pincode",
+                        validNumber:"Only numbers are accepted" ,
+                    }
+                },
+            });
+    
+            $.validator.addMethod(
+                "validProductName",
+                function (value, element) {
+                    return /^[a-zA-Z][a-zA-Z0-9\s]*$/.test(value);
+                },
+                "Please enter a valid category name (only characters)."
+            );
+            $.validator.addMethod(
+                "validNumber",
+                function (value, element) {
+                    return /^\d+(\.\d+)?$/.test(value);
+                },
+                "Please enter a valid product price (non negative number)."
+            );
+            $.validator.addMethod(
+                "validDescription",
+                function (value, element) {
+                    // Add your custom validation logic for product description
+                    // You can adjust this according to your requirements
+                    return /^(?!\.+$)(?=.*[^\s])[^]*$/.test(value);
+                },
+                "Please enter a valid product description."
+            );
+            $("#product_stock").on("input", function () {
+                var stockValue = parseInt($(this).val());
+                var isAvailableCheckbox = $("#product_available");
+    
+                // Update the isAvailable checkbox based on the stock value
+                isAvailableCheckbox.prop("checked", stockValue > 0);
+            });
+    
+        });
+    </script>
+    <script>
+        // Wait for the DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all elements with the class 'messages' (adjust as needed)
+            var messageElements = document.querySelectorAll('.success-message,.error-message');
+    
+            // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+            messageElements.forEach(function(messageElement) {
+                setTimeout(function() {
+                    messageElement.style.display = 'none';
+                }, 5000);  // Adjust the time as needed (in milliseconds)
+            });
+        });
+    </script>
 </body>
 
 

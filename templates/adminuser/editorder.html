@@ -1,0 +1,195 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h4 class="page-title">Edit Order</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form method="post" id="editProduct">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Transaction id</label>
+                                <input class="form-control" type="text" name="order_transaction" value="{{ orders.transaction_id }}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Order Status</label>
+                                <select class="form-control" name="order_order-status">
+                                    <option value="{{ orders.Order_status }}" selected>{% if orders.Order_status == 0 %} Pending{% elif orders.Order_status == 1 %}Shipped{% elif orders.Order_status == 2 %}Delivery{% elif orders.Order_status == 3 %}Cancel{% else %}Invalid{%endif%}</option>
+                                        <option value="{{ orders.payment_method }}">{{ orders.payment_method }}</option>
+                                </select>
+                            </div>
+                        </div><div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                <select class="form-control" name="order_payment-method">
+                                    <option value="{{ orders.payment_method }}" selected>{% if orders.payment_method == 0 %} Razorpay{% elif orders.payment_method == 1 %}Cash on Delivery{% elif orders.payment_method == 2 %}UPI{% else %}Invalid{%endif%}</option>
+                                        <option value="{{ orders.payment_method }}">{{ orders.payment_method }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Payment Status</label>
+                                <select class="form-control" name="order_payment-status">
+                                    <option value="{{ orders.payment_status }}" selected>{% if orders.payment_status == 0 %} Pending{% elif orders.payment_status == 1 %}Completed{% elif orders.payment_status == 2 %}Failed{% else %}Invalid{%endif%}</option>
+                                     {% for payment in payment_statuses %}   
+                                    <option value="{{ payment.payment_method }}">{{ payment.payment_method }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                Cancel&nbsp;&nbsp;
+                                <input class="" type="checkbox" name="order_cancel" {% if orders.is_cancel %}checked{% endif %}>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Date ordered</label>
+                                <input class="form-control" type="text" name="order_date-ordered" value="{{ orders.date_ordered }}">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Total price</label>
+                                <!-- <textarea class="form-control" name="product_description" placeholder="Please write product descritpion with ;(semi-colon) separated.(End of one semicolon is a statement).No need to write semicolon in last statement.">{{ orders.total_price }}</textarea> -->
+                                <input type="text" class="form-control " value="{{ orders.total_price }}" name="order_price" >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Customer Name</label>
+                                <input class="form-control" type="text" name="order_customer" value="{{ orders.customer }}" >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="m-t-20 text-center">
+                        <button class="btn btn-primary submit-btn" type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    $().ready(function () {
+        $("#editProduct").validate({
+            rules: {
+                product_name: {
+                    required: true,
+                    validProductName: true,
+                },
+                product_price: {
+                    required: true,
+                    validNumber: true,
+                },
+                product_stock: {
+                    required: true,
+                    validNumber: true,
+                },
+                product_priority: {
+                    required: true,
+                    validNumber: true,
+                },
+                product_description: {
+                    required: true,
+                    validDescription:true,
+                },
+            },
+            messages: {
+                product_name: {
+                    required: "Please enter your product name.",
+                    validProductName: "Please enter a valid product name (only characters).",
+                },
+                product_price: {
+                    required: "Please enter your product price.",
+                    validNumber: "Please enter a valid product price (non negative number).",
+                },
+                product_stock: {
+                    required: "Please enter your product stock.",
+                    validNumber: "Please enter a valid stock (non negative number).",
+                },
+                product_priority: {
+                    required: "Please enter priority of your product .",
+                    validNumber: "Please enter a valid priority (non negative number).",
+                },
+                product_description: {
+                    required: "Please enter your product description.",
+                    validDescription:"enter valid description."
+                },
+            },
+        });
+
+        $.validator.addMethod(
+            "validProductName",
+            function (value, element) {
+                return /^[a-zA-Z][a-zA-Z0-9\s]*$/.test(value);
+            },
+            "Please enter a valid category name (only characters)."
+        );
+        $.validator.addMethod(
+            "validNumber",
+            function (value, element) {
+                return /^\d+(\.\d+)?$/.test(value);
+            },
+            "Please enter a valid product price (non negative number)."
+        );
+        $.validator.addMethod(
+            "validDescription",
+            function (value, element) {
+                // Add your custom validation logic for product description
+                // You can adjust this according to your requirements
+                return /^(?!\.+$)(?=.*[^\s])[^]*$/.test(value);
+            },
+            "Please enter a valid product description."
+        );
+        $("#product_stock").on("input", function () {
+            var stockValue = parseInt($(this).val());
+            var isAvailableCheckbox = $("#product_available");
+
+            // Update the isAvailable checkbox based on the stock value
+            isAvailableCheckbox.prop("checked", stockValue > 0);
+        });
+
+    });
+</script>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+{% endblock %}

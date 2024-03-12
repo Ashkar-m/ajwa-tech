@@ -619,6 +619,11 @@ pre code {
   text-align: center;
   color: red;
 }
+.warning-message {
+  font-size: xx-large;
+  text-align: center;
+  color: orange;
+}
 
 @media (min-width: 576px) {
   .container, .container-sm {

@@ -35,27 +35,10 @@
         </div>
         <div class="col-lg-6 col-6 text-left">
 
-            <form method="get" action="{% url 'search' %}">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search for products"  name="q">
-                    <div class="input-group-append">
-                        <span class="input-group-text bg-transparent text-primary">
-                            <button type="submit" class="search-button"><i class="fa fa-search"></i></button>
-                        </span>
-                    </div>
-                </div>
-            </form>
-
+           
         </div>
         <div class="col-lg-3 col-6 text-right">
-            <a href="" class="btn border">
-                <i class="fas fa-heart text-primary"></i>
-                <span class="badge">0</span>
-            </a>
-            <a href="" class="btn border">
-                <i class="fas fa-shopping-cart text-primary"></i>
-                <span class="badge">0</span>
-            </a>
+           
             <a href="{% url 'userprofile' %}" class="btn border">
                 <i class="fas fa-solid fa-user"></i>
             </a>
@@ -89,15 +72,8 @@
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                     <div class="navbar-nav mr-auto py-0">
                         <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
-                        <a href="{% url 'shop' %}" class="nav-item nav-link active">Shop</a>
-                        <!-- <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">categories</a>
-                            <div class="dropdown-menu rounded-0 m-0">
-                                {% for category in categorys %}
-                                <a href="{% url 'category' slug=category.slug %}" class="dropdown-item">{{ category.name }}</a>
-                                {% endfor %}
-                            </div>
-                        </div> -->
+                        <a href="{% url 'shop' %}" class="nav-item nav-link ">Shop</a>
+                        
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Categories</a>
                             <div class="dropdown-menu rounded-0 m-0">
@@ -108,6 +84,8 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <a href="{% url 'cart' %}" class="nav-item nav-link ">Cart</a>
+                        <a href="{% url 'checkout' %}" class="nav-item nav-link active">Order</a>
                     </div>
                     <div class="navbar-nav ml-auto py-0">
                         {% if not user.is_authenticated %}
@@ -128,7 +106,7 @@
 <div class="container-fluid pt-5">
     <div class="row px-xl-5">
         <div class="col-lg-8">
-            <div class="col-lg-8 table-responsive mb-5">
+            <div class="col-lg-12 table-responsive mb-5">
                 <table class="table table-bordered text-center mb-0">
                     <thead class="bg-secondary text-dark">
                         <tr>
@@ -137,10 +115,10 @@
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Total</th>
-                            <th>Remove</th>
+                            
                         </tr>
                     </thead>
-                    <tbody class="align-middle">
+                    <tbody class="align-middle"> 
                         {% for cart in cart_items %}
                         {% if not cart.quantity == 0 %}
                         <tr>
@@ -149,30 +127,57 @@
                             {% endfor %}</td>
                             <td class="align-middle">{{ cart.product.name }}</td>
                             <td class="align-middle">{{ cart.product.price }}</td>
-                            <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'removefromcart' product_id=cart.product.id %}"><button class="btn btn-sm btn-primary btn-minus">
-                                        <i class="fa fa-minus"></i>
-                                        </button></a>
-                                    </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="{{ cart.quantity }}">
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'addtocart' product_id=cart.product.id %}"><button class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </button></a>
-                                    </div>
-                                </div>
-                            </td>
+                            <td class="align-middle">{{ cart.quantity }}</td>
                             <td class="align-middle">{{ cart.subtotal }}</td>
-                            <td class="align-middle"><a href="{% url 'removefromcart' product_id=cart.product.id %}"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
                         </tr>
                         {% endif %}
                             {% endfor %}
                     </tbody>
                 </table>
             </div>
-            <div class="collapse mb-4" id="shipping-address">
+            <form method="post" id="addressform">
+                {% csrf_token %}
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Address</h4>
+                        
+                    </div>
+                    <div class="card-body">
+                        <form method="post" id="addressForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="selectedAddress">Select Address:</label>
+                            <select class="custom-select" id="selectedAddress" name="selected_address">
+                                {% if user_order.address.id %}
+                                    <option value="{{ user_order.address.id }}" selected >
+                                        {{ user_order.address.street_address }}, {{ user_order.address.city }},
+                                        {{ user_order.address.district }}, {{ user_order.address.state }},
+                                        {{ user_order.address.country }}, PINCODE: {{ user_order.address.zip_code }}
+                                    </option>
+                                    {% for fadrs in filtered_address %}
+                                        <option value="{{ fadrs.id }}">
+                                            {{ fadrs.street_address }}, {{ fadrs.city }}, {{ fadrs.district }},
+                                            {{ fadrs.state }}, {{ fadrs.country }}, PINCODE: {{ fadrs.zip_code }}
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for adrs in address %}
+                                        <option value="{{ adrs.id }}">
+                                            {{ adrs.street_address }}, {{ adrs.city }}, {{ adrs.district }},
+                                            {{ adrs.state }}, {{ adrs.country }}, PINCODE: {{ adrs.zip_code }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" type="submit" name="submit_type" value="select_address">select address</button>
+                    </form>
+                        
+                    </div>
+                </div>
+            </form>
+            <!-- <div class="collapse mb-4" id="shipping-address">
                 <h4 class="font-weight-semi-bold mb-4">Shipping Address</h4>
                 <div class="row">
                     <div class="col-md-6 form-group">
@@ -221,7 +226,7 @@
                         <input class="form-control" type="text" placeholder="123">
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="col-lg-4">
             <div class="card border-secondary mb-5">
@@ -229,7 +234,7 @@
                     <h4 class="font-weight-semi-bold m-0">Order Total</h4>
                 </div>
                 <div class="card-body">
-                    <h5 class="font-weight-medium mb-3">Products</h5>
+                    <!-- <h5 class="font-weight-medium mb-3">Products</h5>
                     <div class="d-flex justify-content-between">
                         <p>Colorful Stylish Shirt 1</p>
                         <p>$150</p>
@@ -241,52 +246,63 @@
                     <div class="d-flex justify-content-between">
                         <p>Colorful Stylish Shirt 3</p>
                         <p>$150</p>
-                    </div>
-                    <hr class="mt-0">
+                    </div> -->
+                    <!-- <hr class="mt-0"> -->
                     <div class="d-flex justify-content-between mb-3 pt-1">
                         <h6 class="font-weight-medium">Subtotal</h6>
-                        <h6 class="font-weight-medium">$150</h6>
+                        <h6 class="font-weight-medium">{{ subtotal }}</h6>
                     </div>
                     <div class="d-flex justify-content-between">
                         <h6 class="font-weight-medium">Shipping</h6>
-                        <h6 class="font-weight-medium">$10</h6>
+                        <h6 class="font-weight-medium">{{ shipping_charge }}</h6>
                     </div>
                 </div>
                 <div class="card-footer border-secondary bg-transparent">
                     <div class="d-flex justify-content-between mt-2">
                         <h5 class="font-weight-bold">Total</h5>
-                        <h5 class="font-weight-bold">$160</h5>
+                            <h5 class="font-weight-bold">{{ user_order.total_price }}</h5>
                     </div>
                 </div>
             </div>
-            <div class="card border-secondary mb-5">
-                <div class="card-header bg-secondary border-0">
-                    <h4 class="font-weight-semi-bold m-0">Payment</h4>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="paypal">
-                            <label class="custom-control-label" for="paypal">Paypal</label>
+            <form method="post" id="paymentform">
+                {% csrf_token %}
+                <div class="card border-secondary mb-5">
+                    <div class="card-header bg-secondary border-0">
+                        <h4 class="font-weight-semi-bold m-0">Payment</h4>
+                    </div>
+                    <div class="card-body">
+                        
+                        
+                        <div class="form-group">
+                        <!-- {% for key, value in payment_method.items %}
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="payment_{{ key }}" value="1">
+                                <label class="custom-control-label" for="payment_{{ key }}">{{ value }}</label>
+                            </div>
+                        {% endfor %} -->
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="razorpay" value="0">
+                                <label class="custom-control-label" for="razorpay">Razorpay</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="cod" value="1">
+                                <label class="custom-control-label" for="cod">Cash On Delivery</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" name="payment" id="upi" value="2">
+                                <label class="custom-control-label" for="upi">UPI</label>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="directcheck">
-                            <label class="custom-control-label" for="directcheck">Direct Check</label>
-                        </div>
-                    </div>
-                    <div class="">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" name="payment" id="banktransfer">
-                            <label class="custom-control-label" for="banktransfer">Bank Transfer</label>
-                        </div>
+                    <div class="card-footer border-secondary bg-transparent">
+                        <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" name="submit_type" type="submit" value="place_order">Place Order</button>
                     </div>
                 </div>
-                <div class="card-footer border-secondary bg-transparent">
-                    <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3">Place Order</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -337,4 +353,102 @@
     </div>
     
 </div>
+
+
+<script>
+    $().ready(function () {
+        $("#addressform").validate({
+            rules: {
+                selected_address: {
+                    required: true,
+                },
+                
+            },
+            messages: {
+                selected_address: {
+                    required: "Please select an address",
+                },
+            
+            },
+        });
+
+        
+    });
+</script>
+<script>
+    $().ready(function () {
+        $("#paymentform").validate({
+            rules: {
+                payment: {
+                    required: true,
+                },
+                
+            },
+            messages: {
+                payment: {
+                    required: "Please select an address",
+                },
+            
+            },
+        });
+
+        
+    });
+</script>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
 <!-- Footer End -->
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+
+<!-- validation scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="mail/jqBootstrapValidation.min.js"></script>
+<script src="mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="{% static 'js/product/main.js"></script>
+
+
+<!-- limiting the time of message into 5 seconds -->
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+</body>
+</html>

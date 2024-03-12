@@ -1,5 +1,6 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from . models import *
+from cart . models import *
 from user.models import UserModel
 
 from django.views.decorators.cache import cache_control
@@ -20,6 +21,9 @@ def userProfile(request):
         profile = UserProfile.objects.get(user_id=users.id)
         address = profile.address
         address_data=Address.objects.filter(user_id=profile.user_id)
+
+        ordered_items=Order.objects.filter(customer_id=profile.user_id).exclude(complete=False)
+        
         
           
     except  UserModel.DoesNotExist:
@@ -27,6 +31,8 @@ def userProfile(request):
         users = None
         address_data = None
         address = None
+        ordered_items=None
+        
 
     except UserProfile.DoesNotExist:
         # Handle the case where UserProfile does not exist for the current user
@@ -34,55 +40,20 @@ def userProfile(request):
         users = None
         address = None 
         address_data = None
+        ordered_items=None
+        
     
     
     
-    context = {'profile': profile,'users':users ,'address': address,'address_data':address_data}
+    context = {'profile': profile,
+                'users':users ,
+                'address': address,
+                'address_data':address_data,
+                'ordered_items':ordered_items,}
     
     return render(request,'userprofile/profile.html',context=context)
 
 
-# def adminAddProduct(request):
-#     category=Category.objects.all()
-#     if request.method=='POST':
-#         product_name = request.POST.get('product_name')
-#         product_price = request.POST.get('product_price')
-#         product_category = request.POST.get('product_category')
-#         product_stock = request.POST.get('product_stock')
-#         product_available = request.POST.get('product_available') == 'on'  # Convert checkbox value to boolean
-#         product_priority = request.POST.get('product_priority')
-#         product_description = request.POST.get('product_description')
-
-#         try:
-#             if product_category:
-#                 if Product.objects.filter(name=product_name).exists():
-#                     messages.error(request, "product already exists. Please choose a different one.")
-#                     return redirect(request.path)
-#                 # get the category object
-#                 category=Category.objects.get(name=product_category)
-#                 # Create a new Product instance
-#                 new_product = Product.objects.create(
-#                     name=product_name,
-#                     price=product_price,
-#                     category=category,
-#                     stock=product_stock,
-#                     available=product_available,
-#                     priority=product_priority,
-#                     description=product_description,
-#                 )
-#                 new_product.save()
-#                 messages.success(request,"sucessfully added new product.")
-#                 return redirect(adminProductmng)
-#             else:
-#                 messages.error(request,"Invalid category or category doesn'exist.")
-        
-#         except Category.DoesNotExist:
-#             messages.error(request, "Category does not exist.")
-#         except IntegrityError:
-#             messages.error(request, "Product with this name already exists.")
-
-#     context={'categorys':category}
-#     return render(request,'adminuser/addproduct.html',context=context)
 
 def addProfile(request):
     social_data=User.objects.get(id=request.user.id)
@@ -133,12 +104,16 @@ def addProfile(request):
         users.save()
         users.user.save()
 
-        user_profile.gender = gender
-        user_profile.birthdate = dob
+        if gender:
+            user_profile.gender = gender
+        if dob:
+            user_profile.birthdate = dob
         if profile:
             user_profile.profile_pic = profile
 
         user_profile.save()
+
+        return redirect(userProfile)
 
 
         # user_address.street_address=address, 

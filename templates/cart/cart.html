@@ -52,10 +52,10 @@
                 <i class="fas fa-heart text-primary"></i>
                 <span class="badge">0</span>
             </a>
-            <a href="" class="btn border">
+            <!-- <a href="" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
                 <span class="badge">0</span>
-            </a>
+            </a> -->
             <a href="{% url 'userprofile' %}" class="btn border">
                 <i class="fas fa-solid fa-user"></i>
             </a>
@@ -63,7 +63,7 @@
     </div>
 </div>
 {% for message in messages %}
-                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% endif %}">
                             {{ message }}
                         </div>
                         {% endfor %}
@@ -89,7 +89,7 @@
                 <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                     <div class="navbar-nav mr-auto py-0">
                         <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
-                        <a href="{% url 'shop' %}" class="nav-item nav-link active">Shop</a>
+                        <a href="{% url 'shop' %}" class="nav-item nav-link ">Shop</a>
                         <!-- <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">categories</a>
                             <div class="dropdown-menu rounded-0 m-0">
@@ -108,6 +108,7 @@
                                 {% endfor %}
                             </div>
                         </div>
+                        <a href="{% url 'cart' %}" class="nav-item nav-link active">Cart</a>
                     </div>
                     <div class="navbar-nav ml-auto py-0">
                         {% if not user.is_authenticated %}
@@ -164,7 +165,7 @@
                             </div>
                         </td>
                         <td class="align-middle">{{ cart.subtotal }}</td>
-                        <td class="align-middle"><a href="{% url 'removefromcart' product_id=cart.product.id %}"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
+                        <td class="align-middle"><a href="{% url 'removebutton' product_id=cart.product.id %}"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></a></td>
                     </tr>
                     {% endif %}
                         {% endfor %}
@@ -284,7 +285,15 @@
                         <h5 class="font-weight-bold">Total</h5>
                         <h5 class="font-weight-bold">{{ cart_total }}</h5>
                     </div>
-                    <a href="{% url 'checkout' %}"><button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button></a>
+
+                    {% if warning_issued %}
+                            <a href="#"><button  class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button></a>
+                    {% else %}
+                    {% if cart_filter %}
+                            <a href="{% url 'checkout' %}"><button  class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button></a>
+                    {% endif %}
+                    {% endif %}
+                    
                 </div>
             </div>
         </div>
@@ -338,3 +347,39 @@
     
 </div>
 <!-- Footer End -->
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+<!-- Contact Javascript File -->
+<script src="mail/jqBootstrapValidation.min.js"></script>
+<script src="mail/contact.js"></script>
+
+<!-- Template Javascript -->
+<script src="{% static 'js/product/main.js"></script>
+
+
+<!-- limiting the time of message into 5 seconds -->
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+</body>
+</html>

@@ -30,14 +30,46 @@
     .page-wrapper > .content {
         padding: 30px;
     }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px; /* Adjust padding as needed */
+    }
+    
+    .brand-title {
+        color: white;
+        font-size: 30px; /* Adjust font size as needed */
+    }
+    @media (min-width: 576px) and (max-width: 992px) {
+        .header-left {
+            order: 2;
+            text-align: center; /* Center the brand title */
+        }
+    
+        .mobile_btn {
+            order: 1;
+            margin-left: auto; /* Move the toggle button to the right */
+        }
+    
+        .user-menu {
+            display: none; /* Hide the user menu on medium screens */
+        }
+    
+        .mobile-user-menu {
+            display: block; /* Show the mobile user menu on medium screens */
+            margin-left: auto; /* Move the mobile user menu to the right */
+        }
+    }
 </style>
     
 </head>
 
 <body>
     <div class="main-wrapper">
-        <div class="header">
+        <div class="header" style="background-color: #D19C97 ;">
 			<div class="header-left">
+                <span class="brand-title">AJWA TECH</span>
 				</div>
 			<a id="mobile_btn" class="mobile_btn float-left" href=""><i class="fa fa-bars"></i></a>
             <ul class="nav user-menu float-right">
@@ -56,7 +88,7 @@
                     </a>
 					<div class="dropdown-menu">
                         <a class="dropdown-item" href="{% url 'index' %}">Home</a>
-						<a class="dropdown-item" href="">View Profile</a>
+						<a class="dropdown-item" href="{% url 'userprofile' %}">User Profile</a>
 						
                         <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                         
@@ -67,13 +99,20 @@
                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{% url 'index' %}">Home</a>
-                    <a class="dropdown-item" href="">View Profile</a>
+                    <a class="dropdown-item" href="{% url 'userprofile' %}">User Profile</a>
                     
                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                     
                 </div>
             </div>
         </div>
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
         <div class="page-wrapper">
             <div class="content">
                 <div class="row">
@@ -170,7 +209,8 @@
                                             <div class="form-group form-focus focused">
                                                 {% if profile_data.birthdate %}
                                                 <label class="focus-label">Birth Date</label>
-                                                <input class="form-control floating" type="date"  name="dob" value="{{ profile_data.birthdate }}">
+                
+                                                <input class="form-control floating" type="date"  name="dob" value="{{ profile_data.birthdate|date:'Y-m-d' }}">
                                                 {% else %}
                                                 <label class="focus-label">Birth Date</label>
                                                 <input class="form-control floating" type="date" placeholder="Enter your birthdate" name="dob" value="YYYY-MM-DD">
@@ -181,7 +221,7 @@
                                             <div class="form-group form-focus select-focus focused">
                                                 <label class="focus-label">Gender</label>
                                                 <select class="select form-control floating select2-hidden-accessible" tabindex="-1" aria-hidden="true" name="gender">
-                                                    <option value="Select Your gender" selected disabled>Gender</option>
+                                                    <option value="Select Your gender" disabled selected >Gender</option>
                                                     {% if profile_data.gender %}
                                                         <option value="{{ profile_data.gender }}" selected> {% if profile_data.gender == 'F' %} Female {% elif profile_data.gender == 'M' %}Male {% elif profile_data.gender == 'O' %}Other {% endif %} </option>
                                                         {% for choice in gender.Gender.choices %}
@@ -401,6 +441,45 @@
     <script src="{% static 'css/adminuser/assets//js/bootstrap.min.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/jquery.slimscroll.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/app.js' %}"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    $().ready(function () {
+        $("#addProfile").validate({
+            rules: {
+                profile_pic: {
+                    extension: "jpg|jpeg|png|gif", // Add more extensions if needed
+                    accept: "image/*",
+                },
+            },
+            messages: {
+                profile_pic: {
+                    extension: "please enter proper extension", // Add more extensions if needed
+                    accept: "Only image files are accepted",
+                },
+            },
+        });
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
 </body>
 
 
