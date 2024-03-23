@@ -22,7 +22,7 @@ def userProfile(request):
         address = profile.address
         address_data=Address.objects.filter(user_id=profile.user_id)
 
-        ordered_items=Order.objects.filter(customer_id=profile.user_id).exclude(complete=False)
+        ordered_items=Order.objects.filter(customer_id=profile.user_id).exclude(complete=False).order_by('-date_ordered')
         
         
           
@@ -43,7 +43,8 @@ def userProfile(request):
         ordered_items=None
         
     
-    
+    if users is None:
+        return redirect(addProfile)
     
     context = {'profile': profile,
                 'users':users ,
@@ -54,7 +55,8 @@ def userProfile(request):
     return render(request,'userprofile/profile.html',context=context)
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def addProfile(request):
     social_data=User.objects.get(id=request.user.id)
     try:
@@ -64,7 +66,7 @@ def addProfile(request):
         gender=profiles[0]
         pk_value=profiles[0].id
 
-        print(profiles[0].gender,profiles[0].birthdate)
+        # print(profiles[0].gender,profiles[0].birthdate)
 
         addresses=Address.objects.filter(user_id=users.id)
 
@@ -85,7 +87,7 @@ def addProfile(request):
     if request.method=='POST':
         name=request.POST.get('name')
         mobile=request.POST.get('mobile')
-        email=request.POST.get('email')
+        # email=request.POST.get('email')
         gender=request.POST.get('gender')
         dob=request.POST.get('dob')
         address=request.POST.get('street_address')
@@ -100,7 +102,7 @@ def addProfile(request):
         # try:
         users.name=name
         users.mobile=mobile
-        users.user.email=email
+        # users.user.email=email
         users.save()
         users.user.save()
 
@@ -128,6 +130,9 @@ def addProfile(request):
 
         # except Exception as e:
         #     messages.error(request,f"error:{e}")
+    if users is None:
+        return redirect(socialAccount)
+
     if users is None and request.method=='POST':
         user_social=UserModel.objects.create(name=name,mobile=mobile,user_id=social_data.id)
 
@@ -137,6 +142,8 @@ def addProfile(request):
     
     return render(request,'userprofile/addprofile.html',context=context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def adduserAddress(request,pk):
     profile=UserProfile.objects.get(pk=pk)
     if request.method == 'POST':
@@ -156,6 +163,8 @@ def adduserAddress(request,pk):
 
     return render(request,'userprofile/adduserAddress.html')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def edituserAddress(request,pk):
     address=Address.objects.get(pk=pk)
 
@@ -184,6 +193,8 @@ def edituserAddress(request,pk):
 
     return render(request,'userprofile/edituserAddress.html',context=context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def deleteuserAddress(request,pk):
     address=Address.objects.get(pk=pk)
     try:
@@ -197,6 +208,8 @@ def deleteuserAddress(request,pk):
 
     return redirect(addProfile)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def editProfile(request,pk):
     users=UserModel.objects.get(pk=pk)
     try:
@@ -247,3 +260,68 @@ def editProfile(request,pk):
 
     context={'users':users,'profile':profile}
     return render(request,'userprofile/editprofile.html',context=context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
+def socialAccount(request):
+    social_data=User.objects.get(id=request.user.id)
+    name=request.POST.get('name')
+    mobile=request.POST.get('mobile')
+    email=request.POST.get('email')
+    
+    try:
+        users = UserModel.objects.get(user_id=request.user.id)
+    except  UserModel.DoesNotExist:
+        users = None
+
+    if users is None and request.method=='POST':
+        user_social=UserModel.objects.create(name=name,mobile=mobile,user_id=social_data.id)
+        user_social.user.email=email
+        user_social.save()
+
+        return redirect(addProfile)
+    
+    email_address=request.user.email
+    print(email_address)
+
+    context={'email_address':email_address}
+
+    return render(request,'userprofile/socialaccount.html',context=context)
+
+def orderDetail(request,order_id):
+    order = get_object_or_404(Order, id=order_id)
+    for i in order.order_items.all():   
+        print(i.product.name)
+    context={'order': order}
+    return render(request, 'userprofile/orderdetail.html',context=context)
+
+
+def changePassword(request):
+
+    user=request.user
+    if request.method == 'POST':
+        
+        old_pass=request.POST.get('oldpassword')
+        pass1=request.POST.get('newpassword')
+        pass2=request.POST.get('confirmpassword')
+
+        try:
+            if old_pass == pass1:
+                messages.error(request, 'Old Password and new password are equal. Please enter a new password.')
+            elif user.check_password(old_pass):
+                if pass1 == pass2:
+                    user.set_password(pass1)
+                    user.save()
+                    messages.success(request, 'Password changed successfully.')
+                    return redirect('userlog')
+                else:
+                    messages.error(request, 'New passwords do not match.')
+            else:
+                messages.error(request, 'Incorrect old password.')
+                
+        except Exception as e:
+                messages.error(request, 'An error occurred while changing the password.')
+                # Log the exception for debugging
+                print(e)
+            
+    return render(request,'userprofile/changepassword.html')

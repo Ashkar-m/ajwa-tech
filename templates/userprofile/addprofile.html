@@ -129,56 +129,7 @@
                         {% endfor %}
                     <div class="card-box">
                         <h3 class="card-title">Basic Informations</h3>
-                        <!-- <div class="row">
-                            <div class="col-md-2">
-                                <div class="profile-img-wrap" style="height:auto;width:auto;">
-                                    <input type="file" name="profile_pic" class="form-control-file form-control-sm" accept="image/*">
-                                </div>
-                            </div>
-                            <div class="col-md-10">
-                                <div class="profile-basic">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group form-focus focused">
-                                                <label class="focus-label">Name</label>
-                                                <input type="text" class="form-control floating" value="{{ users.name }}" name="name">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group form-focus focused">
-                                                <label class="focus-label">Mobile</label>
-                                                <input type="number" class="form-control floating" value="{{ users.mobile }}" name="mobile">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group form-focus focused">
-                                                <label class="focus-label">Birth Date</label>
-                                                    <input class="form-control floating" type="date" placehoeder="Enter your birthdate" name="dob" placeholder="yyyy-mm-dd">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group form-focus select-focus focused">
-                                                <label class="focus-label">Gender</label>
-                                                <select class="select form-control floating select2-hidden-accessible" tabindex="-1" aria-hidden="true" name="gender">
-                                                    <option value="Select Your gender" selected disabled>Gender</option>
-                                                    <option value="{{ profile.gender }}">"{{ profile.gender }}"</option>
-                                                    <option value="{{ profile.gender }}">"{{ profile.gender }}"</option>
-                                                    <option value="{{ profile.gender }}">"{{ profile.gender }}"</option>
-                                                    
-
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group form-focus focused">
-                                                <label class="focus-label">Email</label>
-                                                    <input class="form-control floating" type="text" value="{{ users.user.email }}" name="email">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> -->
+                        
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="profile-img-wrap" style="height:auto;width:auto;">
@@ -233,15 +184,19 @@
                                                         {% endfor %}
                                                     {% endif %}
                                                     
-                                                    <!-- <option value="{{ profile.gender }}">"{{ profile.gender }}"</option>
-                                                    <option value="{{ profile.gender }}">"{{ profile.gender }}"</option> -->
+                                                    
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group form-focus focused">
                                                 <label class="focus-label">Email</label>
-                                                <input class="form-control floating" type="text" value="{{ users.user.email }}" name="email">
+                                                <input class="form-control floating" id="email" type="text" value="{{ users.user.email }}" name="email">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group form-focus focused">
+                                                <a href="{% url 'changepassword' %}">Change Password</a>
                                             </div>
                                         </div>
                                     </div>
@@ -252,56 +207,7 @@
                     </div>
                     <div class="card-box">
                         <h3 class="card-title">Address:</h3>
-                        <!-- <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Address</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter Your street address" name="street_address">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">City</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter your city or town" name="city">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">District</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter your district" name="district">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">State</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter your state" name="state">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Country</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter your country" name="country">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Zip code</label>
-                                    <input type="text" class="form-control floating" placeholder="Enter your zip code" name="zip_code">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group form-focus focused">
-                                    <label>
-                                    Primary Address:&nbsp;&nbsp;
-                                    <input type="checkbox" class=""  name="is_primary">
-                                </label>
-                                </div>
-                            </div>
-
-                            <div class="add-more">
-                                <a href= class="btn btn-primary"><i class="fa fa-plus"></i> Add More Address </a>
-                            </div>
-                        </div> -->
+                        
                     {% if addresses %}
                         {% for address in addresses %}
                     {% if not address.is_primary %}
@@ -334,96 +240,7 @@
                     <a href="{% url 'adduseraddress' pk=pk_value %}" class="btn btn-primary"><i class="fa fa-plus"></i> Add More Address </a>
                     {% endif %}
                     </div>
-                    <!-- <div class="card-box">
-                        <h3 class="card-title">Education Informations</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Institution</label>
-                                    <input type="text" class="form-control floating" value="Oxford University">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Subject</label>
-                                    <input type="text" class="form-control floating" value="Computer Science">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Starting Date</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control floating datetimepicker" value="01/06/2002">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Complete Date</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control floating datetimepicker" value="31/05/2006">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Degree</label>
-                                    <input type="text" class="form-control floating" value="BE Computer Science">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Grade</label>
-                                    <input type="text" class="form-control floating" value="Grade A">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="add-more">
-                            <a href="#" class="btn btn-primary"><i class="fa fa-plus"></i> Add More Institute</a>
-                        </div>
-                    </div>
-                    <div class="card-box">
-                        <h3 class="card-title">Experience Informations</h3>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Company Name</label>
-                                    <input type="text" class="form-control floating" value="Digital Devlopment Inc">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Location</label>
-                                    <input type="text" class="form-control floating" value="United States">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Job Position</label>
-                                    <input type="text" class="form-control floating" value="Web Developer">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Period From</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control floating datetimepicker" value="01/07/2007">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-focus focused">
-                                    <label class="focus-label">Period To</label>
-                                    <div class="cal-icon">
-                                        <input type="text" class="form-control floating datetimepicker" value="08/06/2018">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="add-more">
-                            <a href="#" class="btn btn-primary"><i class="fa fa-plus"></i> Add More Experience</a>
-                        </div>
-                    </div> -->
+                    
                     <div class="text-center m-t-20">
                         <button class="btn btn-primary submit-btn" type="submit">Save</button>
                     </div>
@@ -455,13 +272,53 @@
                     extension: "jpg|jpeg|png|gif", // Add more extensions if needed
                     accept: "image/*",
                 },
+                name:{
+                    validProductName:true,
+                },
+                dob: {
+                    max: "2009-12-31", // DOB should be before the end of 2009
+                },
+                mobile:{
+                    indianMobileNumber:true,
+                }
             },
             messages: {
                 profile_pic: {
                     extension: "please enter proper extension", // Add more extensions if needed
                     accept: "Only image files are accepted",
                 },
+                dob: {
+                    max: "You shold have atleast 15 years old.",
+                },
+                name:{
+                    validProductName:'please enter your name properly',
+                },
+                mobile:{
+                    indianMobileNumber:'please enter an indian mobile number',
+                },
             },
+        });
+
+        $.validator.addMethod(
+            "validProductName",
+            function (value, element) {
+                return /^[a-zA-Z][a-zA-Z0-9\s]*$/.test(value);
+            },
+            "Please enter a valid category name (only characters)."
+        );
+        $.validator.addMethod(
+            "indianMobileNumber",
+            function (value, element) {
+                // Use a regular expression to check for a 10-digit Indian mobile number
+                return /^[6789]\d{9}$/.test(value);
+            },
+        );
+        $("#email").on("focus", function () {
+            // Check if the email field is already populated
+            if ($(this).val() !== "") {
+                $(this).prop("readonly", true);
+                $(this).attr("title", "Email field is not editable");
+            }
         });
     });
 </script>

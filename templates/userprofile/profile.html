@@ -12,10 +12,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/font-awesome.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/adminuser/assets//css/style.css' %}">
-    <!--[if lt IE 9]>
-		<script src="{% static 'css/adminuser/assets//js/html5shiv.min.js' %}"></script>
-		<script src="{% static 'css/adminuser/assets//js/respond.min.js' %}"></script>
-	<![endif]-->
+    
 <style>
     .page-wrapper {
         left: 0;
@@ -113,9 +110,7 @@
                     </div>
 
                     <div class="col-sm-10 col-9 text-right m-b-30">
-                        <!-- {% if users.id %}
-                        <a href="{% url 'editprofile' pk=users.id %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Edit Profile</a>
-                        {% endif %} -->
+                        
                         <a href="{% url 'addprofile' %}" class="btn btn-primary btn-rounded"><i class="fa fa-plus"></i> Add Profile</a>
                     </div>
                 </div>
@@ -221,180 +216,54 @@
                                         {% for order in ordered_items %}
                                         <tr>
                                         <td class="align-middle">
+                                            {% if order.id %}
+                                            <a href="{% url 'orderdetail' order_id=order.id %}">
                                             {% for order_item in order.order_items.all %}
                                                 {{ order_item.product.name }} X {{ order_item.quantity }}
                                                 <!-- Add any additional product information as needed -->
                                                 <br>
                                             {% endfor %}
+                                            </a>
+                                            {% endif %}
                                         
                                         </td>
                                         <td class="align-middle">{{ order.transaction_id}}</td>
-                                        <td class="align-middle">{{ order.Order_status}}</td>
-                                        <td class="align-middle">{{ order.payment_method}}</td>
+                                        <td class="align-middle">{% if order.Order_status == 0 %} Pending
+                                            {% elif order.Order_status == 1 %}Shipped
+                                            {% elif order.Order_status == 2 %}Delivery
+                                            {% elif order.Order_status == 3 %}Cancel
+                                            {% else %}Invalid
+                                            {%endif%}</td>
+                                        <td class="align-middle">{% if order.payment_method == 0 %} Razorpay
+                                            {% elif order.payment_method == 1 %}Cash on Delivery
+                                            {% elif order.payment_method == 2 %}UPI
+                                            {% else %}Invalid
+                                            {%endif%}</td>
                                         <td class="align-middle">{{ order.date_ordered  }}</td>
                                         <td class="align-middle">{{ order.total_price}}</td>
                                         <td class="align-middle">{% if order.is_cancel %}Cancelled{% else %}Not cancelled {% endif %}</td>
-                                        <td class="align-middle"><a href="{% url 'cancelorder' pk=order.id %}">cancel</a></td>
-                                        </tr>
+                                        {% if order.Order_status == 2  %}
+                                        <td class="align-middle"><a href="">Delivered</a></td>
+                                        {% elif order.payment_status == 2 %}
+                                        <td class="align-middle"><a href="">Payment Failed</a></td>
+                                        {% elif order.is_cancel %}
+                                        <td class="align-middle"><a href="">cancelled</a></td>
+                                        {% else %}
+                                        <td class="align-middle">
+                                            <a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a>
+                                        </td>
+                                        <!-- <td class="align-middle"><a href="{% url 'cancelorder' pk=order.id %}">cancel</a></td> -->
+                                        {% endif %}
+                                    </tr>
                                         
                                             {% endfor %}
-                                        <!-- </tr>
-                                        <tr>
-                                            <td class="align-middle"><img src="img/product-2.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle">
-                                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-minus">
-                                                        <i class="fa fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-plus">
-                                                            <i class="fa fa-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="align-middle"><img src="img/product-3.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle">
-                                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-minus">
-                                                        <i class="fa fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-plus">
-                                                            <i class="fa fa-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="align-middle"><img src="img/product-4.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle">
-                                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-minus">
-                                                        <i class="fa fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-plus">
-                                                            <i class="fa fa-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="align-middle"><img src="img/product-5.jpg" alt="" style="width: 50px;"> Colorful Stylish Shirt</td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle">
-                                                <div class="input-group quantity mx-auto" style="width: 100px;">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-minus">
-                                                        <i class="fa fa-minus"></i>
-                                                        </button>
-                                                    </div>
-                                                    <input type="text" class="form-control form-control-sm bg-secondary text-center" value="1">
-                                                    <div class="input-group-btn">
-                                                        <button class="btn btn-sm btn-primary btn-plus">
-                                                            <i class="fa fa-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="align-middle">$150</td>
-                                            <td class="align-middle"><button class="btn btn-sm btn-primary"><i class="fa fa-times"></i></button></td>
-                                        </tr> -->
+                                        
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- <div class="experience-box">
-                                <ul class="experience-list">
-                                    <li>
-                                        <div class="experience-user">
-                                            <div class="before-circle"></div>
-                                        </div>
-                                        <div class="experience-content">
-                                            <div class="timeline-content">
-                                                <a href="#/" class="name">International College of Medical Science (UG)</a>
-                                                <div>MBBS</div>
-                                                <span class="time">2001 - 2003</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="experience-user">
-                                            <div class="before-circle"></div>
-                                        </div>
-                                        <div class="experience-content">
-                                            <div class="timeline-content">
-                                                <a href="#/" class="name">International College of Medical Science (PG)</a>
-                                                <div>MD - Obstetrics & Gynaecology</div>
-                                                <span class="time">1997 - 2001</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div> -->
+                            
                         </div>
-                        <!-- <div class="card-box mb-0">
-                            <h3 class="card-title">Experience</h3>
-                            <div class="experience-box">
-                                <ul class="experience-list">
-                                    <li>
-                                        <div class="experience-user">
-                                            <div class="before-circle"></div>
-                                        </div>
-                                        <div class="experience-content">
-                                            <div class="timeline-content">
-                                                <a href="#/" class="name">Consultant Gynecologist</a>
-                                                <span class="time">Jan 2014 - Present (4 years 8 months)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="experience-user">
-                                            <div class="before-circle"></div>
-                                        </div>
-                                        <div class="experience-content">
-                                            <div class="timeline-content">
-                                                <a href="#/" class="name">Consultant Gynecologist</a>
-                                                <span class="time">Jan 2009 - Present (6 years 1 month)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="experience-user">
-                                            <div class="before-circle"></div>
-                                        </div>
-                                        <div class="experience-content">
-                                            <div class="timeline-content">
-                                                <a href="#/" class="name">Consultant Gynecologist</a>
-                                                <span class="time">Jan 2004 - Present (5 years 2 months)</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div> -->
+                 
                     </div>
                 </div>
 						</div>
@@ -414,6 +283,18 @@
     <script src="{% static 'css/adminuser/assets//js/bootstrap.min.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/jquery.slimscroll.js' %}"></script>
     <script src="{% static 'css/adminuser/assets//js/app.js' %}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $(".cancel-order").on("click", function(e) {
+                e.preventDefault();
+                var orderId = $(this).data("order-id");
+                if (confirm("Are you sure you want to cancel this order?")) {
+                    window.location.href = "{% url 'cancelorder' pk=0 %}".replace('0', orderId);
+                }
+            });
+        });
+    </script>
 </body>
 
 

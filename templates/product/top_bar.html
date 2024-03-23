@@ -23,16 +23,18 @@
 
         </div>
         <div class="col-lg-3 col-6 text-right">
-            <a href="" class="btn border">
+            <a href="{% url 'wallet' %}" class="btn border">
+                <i class="fas fa-wallet text-primary"></i>  
+            </a>
+            <a href="{% url 'wishlist' %}" class="btn border">
                 <i class="fas fa-heart text-primary"></i>
-                <span class="badge">0</span>
             </a>
             <a href="{% url 'cart' %}" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
                 <span class="badge"></span>
             </a>
             <a href="{% url 'userprofile' %}" class="btn border">
-                <i class="fas fa-solid fa-user"></i>
+                <i class="fas fa-solid fa-user text-primary"></i>
             </a>
         </div>
     </div>

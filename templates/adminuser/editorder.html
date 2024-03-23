@@ -33,7 +33,9 @@
                                 <label>Order Status</label>
                                 <select class="form-control" name="order_order-status">
                                     <option value="{{ orders.Order_status }}" selected>{% if orders.Order_status == 0 %} Pending{% elif orders.Order_status == 1 %}Shipped{% elif orders.Order_status == 2 %}Delivery{% elif orders.Order_status == 3 %}Cancel{% else %}Invalid{%endif%}</option>
-                                        <option value="{{ orders.payment_method }}">{{ orders.payment_method }}</option>
+                                    {% for order in order_statuses %}  
+                                    <option value="{{ order }}">{% if order == 0 %} Pending{% elif order == 1 %}Shipped{% elif order == 2 %}Delivery{% elif order == 3 %}Cancel{% else %}Invalid{%endif%}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div><div class="col-sm-6">
@@ -41,7 +43,7 @@
                                 <label>Payment Method</label>
                                 <select class="form-control" name="order_payment-method">
                                     <option value="{{ orders.payment_method }}" selected>{% if orders.payment_method == 0 %} Razorpay{% elif orders.payment_method == 1 %}Cash on Delivery{% elif orders.payment_method == 2 %}UPI{% else %}Invalid{%endif%}</option>
-                                        <option value="{{ orders.payment_method }}">{{ orders.payment_method }}</option>
+                                    
                                 </select>
                             </div>
                         </div>
@@ -50,8 +52,8 @@
                                 <label>Payment Status</label>
                                 <select class="form-control" name="order_payment-status">
                                     <option value="{{ orders.payment_status }}" selected>{% if orders.payment_status == 0 %} Pending{% elif orders.payment_status == 1 %}Completed{% elif orders.payment_status == 2 %}Failed{% else %}Invalid{%endif%}</option>
-                                     {% for payment in payment_statuses %}   
-                                    <option value="{{ payment.payment_method }}">{{ payment.payment_method }}</option>
+                                    {% for payment in payment_statuses %}  
+                                    <option value="{{ payment }}">{% if payment == 0 %} Pending{% elif payment == 1 %}Completed{% elif payment == 2 %}Failed{% else %}Invalid{%endif%}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -168,13 +170,6 @@
             },
             "Please enter a valid product description."
         );
-        $("#product_stock").on("input", function () {
-            var stockValue = parseInt($(this).val());
-            var isAvailableCheckbox = $("#product_available");
-
-            // Update the isAvailable checkbox based on the stock value
-            isAvailableCheckbox.prop("checked", stockValue > 0);
-        });
 
     });
 </script>

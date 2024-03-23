@@ -1,0 +1,109 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-sm-4 col-3">
+                <h4 class="page-title">Category Offers</h4>
+            </div>
+            <div class="col-sm-8 col-9 text-right m-b-20">
+                <a href="{% url 'addcategoryoffer' %}" class="btn btn btn-primary btn-rounded float-right"><i class="fa fa-plus"></i> Add Cat offer</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-border table-striped custom-table datatable mb-0">
+                        <thead>
+                            <tr>
+                                <th>Category offer id</th>
+                                <th>Category Image</th>
+                                <th>Category Name</th>
+                                <th>Discount Percentage</th>
+                                <th>Edit</th>
+                                <th>List/unlist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td>{{ item.id }}</td>
+                                <td><img src="{{ item.category.image.url }}" alt="Product Image" style="height: 100px; width:100px"> </td>
+                                <td>{{ item.category.name }}</td>
+                                <td>{{ item.percentage }}</td>
+                                <td><a href="{% url 'editcategoryoffer' pk=item.id %}">Edit</a></td>
+                                {% if item.available %}
+                                <td><a href="{% url 'unlistcategoryoffer' pk=item.id %}">Unlist</a></td>
+                                {% else %}
+                                <td><a href="{% url 'listcategoryoffer' pk=item.id %}">List</a></td>
+                                {% endif %}
+                               
+                               
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <span class="step-links">
+                        <span class="current">
+                            Page {{ products.number }} of {{ products.paginator.num_pages }}.
+                        </span>
+                        {% if products.has_previous %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if products.number == 1 %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.paginator.num_pages }}">last &raquo;</a></li>
+                                {% elif products.number == products.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">previous</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">previous</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                        
+                        {% if products.has_next %}
+                            <ul class="pagination justify-content-center mb-3">
+                                {% if products.number == products.paginator.num_pages %}
+                                    <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">previous</a></li>
+                                {% elif not products.has_previous %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">next</a></li>
+                                    <li class="page-item"><a class="page-link" href="?page={{ products.paginator.num_pages }}">last &raquo;</a></li>
+                                {% endif %}
+                            </ul>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

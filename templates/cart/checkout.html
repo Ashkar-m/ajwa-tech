@@ -46,7 +46,7 @@
     </div>
 </div>
 {% for message in messages %}
-                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% endif %}">
                             {{ message }}
                         </div>
                         {% endfor %}
@@ -126,9 +126,10 @@
                                 <img src="{{ image.image.url }}" alt="" style="width: 50px;">
                             {% endfor %}</td>
                             <td class="align-middle">{{ cart.product.name }}</td>
-                            <td class="align-middle">{{ cart.product.price }}</td>
+                            <td class="align-middle">{{ cart.product.discounted_price }}</td>
                             <td class="align-middle">{{ cart.quantity }}</td>
                             <td class="align-middle">{{ cart.subtotal }}</td>
+                            
                         </tr>
                         {% endif %}
                             {% endfor %}
@@ -154,12 +155,21 @@
                                         {{ user_order.address.district }}, {{ user_order.address.state }},
                                         {{ user_order.address.country }}, PINCODE: {{ user_order.address.zip_code }}
                                     </option>
-                                    {% for fadrs in filtered_address %}
+                                    <!-- {% for fadrs in filtered_address %}
                                         <option value="{{ fadrs.id }}">
                                             {{ fadrs.street_address }}, {{ fadrs.city }}, {{ fadrs.district }},
                                             {{ fadrs.state }}, {{ fadrs.country }}, PINCODE: {{ fadrs.zip_code }}
                                         </option>
+                                    {% endfor %} -->
+                                    {% for adrs in address %}
+                                    {% if not adrs.is_primary %}
+                                        <option value="{{ adrs.id }}">
+                                            {{ adrs.street_address }}, {{ adrs.city }}, {{ adrs.district }},
+                                            {{ adrs.state }}, {{ adrs.country }}, PINCODE: {{ adrs.zip_code }}
+                                        </option>
+                                    {% endif %}
                                     {% endfor %}
+
                                 {% else %}
                                     {% for adrs in address %}
                                         <option value="{{ adrs.id }}">
@@ -274,32 +284,29 @@
                         
                         
                         <div class="form-group">
-                        <!-- {% for key, value in payment_method.items %}
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="payment_{{ key }}" value="1">
-                                <label class="custom-control-label" for="payment_{{ key }}">{{ value }}</label>
-                            </div>
-                        {% endfor %} -->
-                            <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="razorpay" value="0">
-                                <label class="custom-control-label" for="razorpay">Razorpay</label>
+                                <input type="radio" class="custom-control-input" name="payment" id="razorpay" value="0" >
+                                <label class="custom-control-label selected" for="razorpay">Razorpay</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="cod" value="1">
+                                <input type="radio" class="custom-control-input" name="payment" id="cod" value="1" >
                                 <label class="custom-control-label" for="cod">Cash On Delivery</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="custom-control custom-radio">
-                                <input type="radio" class="custom-control-input" name="payment" id="upi" value="2">
+                                <input type="radio" class="custom-control-input" name="payment" id="upi" value="2" >
                                 <label class="custom-control-label" for="upi">UPI</label>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="card-footer border-secondary bg-transparent">
-                        <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" name="submit_type" type="submit" value="place_order">Place Order</button>
+                        
+                        <button class="btn btn-lg btn-block btn-primary font-weight-bold my-3 py-3" id="" name="submit_type" type="submit" value="place_order">Place Order</button>
+                       
                     </div>
                 </div>
             </form>
@@ -354,8 +361,80 @@
     
 </div>
 
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    var options = {
+       
+      // Enter the Key ID generated from the Dashboard
+      key: "{{ razorpay_merchant_key }}", 
+       
+      // Amount is in currency subunits.
+      // Default currency is INR. Hence, 
+      // 50000 refers to 50000 paise
+      amount: "{{ razor_context.razorpay_amount }}", 
+      currency: "{{ currency }}",
+       
+      // Your/store name.
+      name: "AJWA TECH", 
+       
+      // Pass the `id` obtained in the response of Step 1
+      order_id: "{{ razorpay_order_id }}", 
+      callback_url: "{{ callback_url }}",
+    };
+     
+    // initialise razorpay with the options.
+    var rzp1 = new Razorpay(options);
+     
+    // add event listener to the payment button.
+    document.getElementById("razorpay").onclick = function (e) {
+      rzp1.open();
+      e.preventDefault();
+    };
+  </script> -->
 
-<script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+  var options = {
+      "key": "rzp_test_G53BCAhSqpomES", // Enter the Key ID generated from the Dashboard
+      "amount": 99999999999, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      "currency": "INR",
+      "name": "AJWA TECH",
+      "description": "Thanks",
+      "image": "http://127.0.0.1:8000/static/assets/img/logo/time.png",
+      "order_id": "{{payment.id}}", 
+      "handler": function (response){
+  
+        window.location.href = `http://127.0.0.1:8000/cart/checkout/`;
+  
+         
+      },
+  
+      "theme": {
+          "color": "#3399cc"
+      }
+  };
+  var rzp1 = new Razorpay(options);
+  rzp1.on('payment.failed', function (response){
+    var errorReason = response.error.reason; // Get the specific error reason from the response
+    if (errorReason === 'PAYMENT_ABORTED') {
+        alert('Payment was aborted by the user.');
+    } else if (errorReason === 'CARD_DECLINED') {
+        alert('The card was declined. Please try another card.');
+    } else {
+        alert('An error occurred during payment.');
+    }
+  });
+  document.getElementById('payment').onclick = function(e){
+      rzp1.open();
+      e.preventDefault();
+
+      document.getElementById('razorpay').checked = true;
+  }
+  </script>
+
+  
+
+  <script>
     $().ready(function () {
         $("#addressform").validate({
             rules: {
@@ -399,7 +478,7 @@
     // Wait for the DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
         // Select all elements with the class 'messages' (adjust as needed)
-        var messageElements = document.querySelectorAll('.success-message,.error-message');
+        var messageElements = document.querySelectorAll('.success-message,.error-message,.warning-message');
 
         // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
         messageElements.forEach(function(messageElement) {

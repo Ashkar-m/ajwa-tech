@@ -75,7 +75,7 @@
                     {% endfor %}
             {% if product.delete_status == 0 or product.category.delete_status == 0 %}
                 <h3 class="font-weight-semi-bold mb-4">Product Unavailable</h3>
-            {% elif product.available %}
+            {% elif product.available and product.stock > 0 %}
             <div class="d-flex align-items-center mb-4 pt-2">
                 <div class="input-group quantity mr-3" style="width: 130px;">
                     <div class="input-group-btn">

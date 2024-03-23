@@ -148,7 +148,7 @@
                             <img src="{{ image.image.url }}" alt="" style="width: 50px;">
                         {% endfor %}</td>
                         <td class="align-middle">{{ cart.product.name }}</td>
-                        <td class="align-middle">{{ cart.product.price }}</td>
+                        <td class="align-middle">{{ cart.product.discounted_price }}</td>
                         <td class="align-middle">
                             <div class="input-group quantity mx-auto" style="width: 100px;">
                                 <div class="input-group-btn">
@@ -258,14 +258,20 @@
             </table>
         </div>
         <div class="col-lg-4">
-            <!-- <form class="mb-5" action="">
+            <form class="mb-5" method="post">
+                {% csrf_token %}
                 <div class="input-group">
-                    <input type="text" class="form-control p-4" placeholder="Coupon Code">
+                    {% if coupon_applied %}
+                    <input type="text" class="form-control p-4" placeholder="Coupon Code" name="coupon" value="{{ coupon_details.coupon_code }}"><button><a href="{% url 'removecoupon' pk=coupon_details.id %}" style="font-size: 20px;">X</a></button>
+                    {% else %}
+                    <input type="text" class="form-control p-4" placeholder="Coupon Code" name="coupon">
+                    {% endif %}
+
                     <div class="input-group-append">
-                        <button class="btn btn-primary">Apply Coupon</button>
+                        <button type="submit" class="btn btn-primary">Apply Coupon</button>
                     </div>
                 </div>
-            </form> -->
+            </form>
             <div class="card border-secondary mb-5">
                 <div class="card-header bg-secondary border-0">
                     <h4 class="font-weight-semi-bold m-0">Cart Summary</h4>
@@ -279,6 +285,16 @@
                         <h6 class="font-weight-medium">Shipping</h6>
                         <h6 class="font-weight-medium">{{ shipping_charge}}</h6>
                     </div>
+                    {% if coupon_applied %}
+                    <div class="d-flex justify-content-between mt-3">
+                        <h6 class="font-weight-medium">Coupon amount</h6>
+                        {% if coupon_applied.discount_type == 0 %}
+                        <h6 class="font-weight-medium">{{ coupon_details.discount }}</h6>
+                        {% else %}
+                        <h6 class="font-weight-medium">{{ discount_percentage }}</h6>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="card-footer border-secondary bg-transparent">
                     <div class="d-flex justify-content-between mt-2">

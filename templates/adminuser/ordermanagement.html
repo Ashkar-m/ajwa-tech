@@ -59,7 +59,7 @@
                                     {% else %}Invalid
                                     {%endif%}</td>
                                 <td>{{ order.date_ordered }}</td>
-                                <td>{{ order.is_cancel }}</td>
+                                <td>{% if  order.is_cancel %}cancelled{% else %}Not cancelled {% endif %}</td>
                                 <td>{{ order.total_price }}</td>
                                 <!-- <td>{{ order.address }}</td> -->
                                 <td>{{ order.customer }}</td>
@@ -68,7 +68,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <!-- <span class="step-links">
+                    <span class="step-links">
                         <span class="current">
                             Page {{ orders.number }} of {{ orders.paginator.num_pages }}.
                         </span>
@@ -99,7 +99,7 @@
                                 {% endif %}
                             </ul>
                         {% endif %}
-                    </span> -->
+                    </span>
                 </div>
             </div>
         </div>

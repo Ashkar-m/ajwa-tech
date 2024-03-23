@@ -56,13 +56,13 @@
                                 <input class="form-control" type="number" name="product_stock" value="{{ product.stock }}" required>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        <!-- <div class="col-sm-6">
                             <div class="form-group">
                                 Availabe&nbsp;&nbsp;
                                 <input class="" type="checkbox" name="product_available" {% if product.available %}checked{% endif %}>
                             </div>
-                        </div>
-                        <div class="col-sm-6">
+                        </div> -->
+                        <div class="col-sm-12">
                             <div class="form-group">
                                 <label>Priority</label>
                                 <input class="form-control" type="number" name="product_priority" value="{{ product.priority }}" required>
@@ -73,7 +73,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Description</label>
-                                        <textarea class="form-control" name="product_description" placeholder="Please write product descritpion with ;(semi-colon) separated.(End of one semicolon is a statement).No need to write semicolon in last statement.">{{ product.description }}</textarea>
+                                        <textarea rows="8" cols="40" class="form-control" name="product_description" placeholder="Please write product descritpion with ;(semi-colon) separated.(End of one semicolon is a statement).No need to write semicolon in last statement.">{{ product.description }}</textarea>
                                         <!-- <input type="text" class="form-control " name="product_description"  required> -->
                                     </div>
                                 </div>

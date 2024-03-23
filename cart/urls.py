@@ -9,4 +9,12 @@ urlpatterns = [
     path('removeButton/<int:product_id>',views.removeButton,name='removebutton'),
     # path('orderhistory/',views.orderHistory,name='orederhistory'),
     # path('orderitem/',views.orderItems,name='orderitem'),
+    path('wishlist/',views.wishlistView,name='wishlist'),
+    path('addtowishlist/<int:product_id>',views.addtoWishlist,name='addtowishlist'),
+    path('wishlisttocart/<int:product_id>',views.wishlistToCart,name='wishlisttocart'),
+    path('removewishlist/<int:product_id>',views.removeWishlist,name='removewishlist'),
+    path('wallet',views.wallet,name='wallet'),
+    path('paymenthandler/',views.paymenthandler,name='paymenthandler'),
+
+    path('removecoupon/<pk>',views.removeCoupon,name='removecoupon'),
 ]

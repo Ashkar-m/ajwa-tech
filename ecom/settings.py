@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
+
 ]
 
 MIDDLEWARE = [
@@ -167,6 +168,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+TIME_ZONE = 'Asia/Kolkata'
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -195,6 +198,7 @@ EMAIL_HOST_USER = 'farhanafida34@gmail.com'
 EMAIL_HOST_PASSWORD ='fdwjnjlwpkdavovu'
 
 
-
-
-
+RAZORPAY_KEY_ID = 'rzp_test_G53BCAhSqpomES'
+RAZORPAY_KEY_SECRET = 'Yxme5GSSap2s8ZIIUrSDqkQk'
+RAZORPAY_CURRENCY = 'INR'
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

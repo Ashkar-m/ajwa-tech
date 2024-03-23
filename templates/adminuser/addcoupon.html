@@ -1,0 +1,210 @@
+{% extends 'adminuser/index.html' %}
+
+{% block midcontent %}
+
+{% load static %}
+<div class="page-wrapper">
+    <div class="content">
+        <center>
+            {% for message in messages %}
+                            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                                {{ message }}
+                            </div>
+            {% endfor %}
+        </center>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h4 class="page-title">Add Coupon</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form method="post" id="addCoupon">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Coupon Name</label>
+                                <input class="form-control" type="text" name="coupon_name">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Minimun amount</label>
+                                <input class="form-control" type="number" name="coupon_minimum_amount">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Discount Type</label>
+                                <select class="form-control" name="coupon_discount_type">
+                                    <option value="" selected disabled>Select Discount Type</option>
+                                            <option value="0">Amount</option>
+                                            <option value="1">Discount percentage</option>
+                                    <!-- Add more categories as needed -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Discount</label>
+                                <input class="form-control" type="number" name="coupon_discount_amount">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Valid From</label>
+                                <input class="form-control" type="datetime-local" name="valid_from">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Valid To</label>
+                                <input class="form-control" type="datetime-local" name="valid_to">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Uses Remaining</label>
+                                <input class="form-control" type="number" name="uses_remaining">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <textarea rows="8" cols="40" class="form-control" name="coupon_description" pattern="^(?![\W_]+$).*$" placeholder="Please enter a description for  coupon"></textarea>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="m-t-20 text-center">
+                        <button class="btn btn-primary submit-btn" type="submit">Create Coupon</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
+<script>
+    $().ready(function () {
+        $("#addCoupon").validate({
+            rules: {
+                coupon_name: {
+                    required: true,
+                    validProductName: true,
+                },
+                coupon_minimum_amount: {
+                    required: true,
+                    validNumber: true,
+                },
+                coupon_discount_type: {
+                    required: true,
+                },
+                coupon_discount_amount: {
+                    required: true,
+                    validNumber: true,
+                },
+                coupon_discount_percentage:{
+                    required: true,
+                    validNumber: true,
+                },
+                valid_from:{
+                    required:true,
+                },
+                valid_to:{
+                    required:true,
+                },
+                uses_remaining:{
+                    required: true,
+                    validNumber: true,
+                }
+                
+            },
+            messages: {
+                coupon_name: {
+                    required: 'Coupon name is required',
+                    validProductName: 'It must be a valid coupon name.Characters preceding with may or may not digits.',
+                },
+                coupon_minimum_amount: {
+                    required: 'Please enter a minimum amount for apply the coupon',
+                    validNumber: 'It must be an integer number',
+                },
+                coupon_discount_type: {
+                    required:  'Please select a discount type',
+                },
+                coupon_discount_amount: {
+                    required:  'Please enter a discount amount.',
+                    validNumber: 'It must be an amount',
+                },
+                coupon_discount_percentage:{
+                    required:  'Please enter a discount percentage.',
+                    validNumber: 'it must be a in range of 0 to 90 percentage',
+                },
+                valid_from:{
+                    required: 'Please select a valid from date.',
+                },
+                valid_to:{
+                    required: 'Please select a valid upto date.',
+                },
+                user_remaining: {
+                    required: 'Please enter how many uses are remaining',
+                    validNumber: 'it must be a valid integer number',
+                },
+            },
+        });
+
+        $.validator.addMethod(
+            "validProductName",
+            function (value, element) {
+                return /^[a-zA-Z][a-zA-Z0-9\s]*$/.test(value);
+            },
+            "Please enter a valid category name (only characters)."
+        );
+        $.validator.addMethod(
+            "validNumber",
+            function (value, element) {
+                return /^\d+$/.test(value);
+            },
+            "Please enter a valid product price (non negative number)."
+        );
+        $.validator.addMethod(
+            "validDescription",
+            function (value, element) {
+                // Add your custom validation logic for product description
+                // You can adjust this according to your requirements
+                return /^(?!.*\b[^\w\s]).*$/gm.test(value);
+            },
+            "Please enter a valid product description."
+        );
+    });
+</script>
+
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
+{% endblock %}

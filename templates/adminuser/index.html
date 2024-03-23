@@ -63,6 +63,9 @@
                             <a href="doctors.html"><i class="fa fa-user-md"></i> <span>Doctors</span></a>
                         </li> -->
                         <li>
+                            <a href="{% url 'adminindex' %}"><i class="fa-solid fa-user-tie"></i> <span>Admin Dashboard</span></a>
+                        </li>
+                        <li>
                             <a href="{% url 'usermng' %}"><i class="fa-solid fa-user"></i> <span>User management</span></a>
                         </li>
                         <li>
@@ -76,6 +79,15 @@
                         </li>
                         <li>
                             <a href="{% url 'ordermng' %}"><i class="fa-solid fa-check"></i> <span>Order management</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'productoffers' %}"><i class="fa-solid fa-cart-arrow-down"></i> <span>Product offers</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'categoryoffers' %}"><i class="fa-solid fa-envelope-open"></i> <span>Category offers</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'couponlist' %}"><i class="fa-solid fa-money-bill"></i> <span>Coupon Management</span></a>
                         </li>
 						<!-- <li class="submenu">
 							<a href="#"><i class="fa fa-user"></i> <span> Employees </span> <span class="menu-arrow"></span></a>

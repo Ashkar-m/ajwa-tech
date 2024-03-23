@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from decimal import Decimal, ROUND_HALF_UP
+
 # Create your models here.
 
 class Category(models.Model):
@@ -30,6 +32,8 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    
+
 class Product(models.Model):
     LIVE=1
     DELETE=0
@@ -45,6 +49,7 @@ class Product(models.Model):
     delete_status=models.IntegerField(choices=Delete_choice,default=LIVE)
     created_at=models.DateField(auto_now_add=True)
     updated_at=models.DateField(auto_now=True)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -58,6 +63,61 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super(Product,self).save(*args,**kwargs)
+    
+    def calculate_tax(self):
+        # Calculate tax as 5% of the product price
+        tax_amount = self.price * Decimal('0.05')
+        return tax_amount
+
+    def calculate_discounted_price(self):
+        # return int(self.price*1.5)
+        cat_offer = self.category.categoryoffer.first()
+        pro_offer = self.productoffer.first()
+
+        if pro_offer and cat_offer:
+            if pro_offer.available and cat_offer.available:
+                discount_percentage_prod = Decimal(pro_offer.percentage) / 100
+                discount_percentage_cat = Decimal(cat_offer.percentage) / 100
+                
+                discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
+                discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
+                
+                self.discounted_price=min(discounted_price_prod, discounted_price_cat).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            
+            elif pro_offer.available and not cat_offer.available:
+                discount_percentage_prod = Decimal(pro_offer.percentage) / 100
+                discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
+                self.discounted_price=discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            
+            elif not pro_offer.available and cat_offer.available:
+                discount_percentage_cat = Decimal(cat_offer.percentage) / 100
+                discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
+                self.discounted_price=discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            
+            else:
+                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        elif pro_offer:
+            if pro_offer.available:
+                discount_percentage_prod = Decimal(pro_offer.percentage) / 100
+                discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
+                self.discounted_price=discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            else:
+                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        elif cat_offer:
+            if cat_offer.available:
+                discount_percentage_cat = Decimal(cat_offer.percentage) / 100
+                discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
+                self.discounted_price=discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            else:
+                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        else:
+            self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        
+        self.save()
+
 
 
 class ProductImage(models.Model):
