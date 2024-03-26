@@ -40,7 +40,7 @@ def get_or_create_cart(request):
     
     return user_cart
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def cartView(request):
     user_cart = get_or_create_cart(request)
@@ -53,8 +53,6 @@ def cartView(request):
 
     warning_issued = False
      
-    
-
     for cart_item in cart_items:
        
         if cart_item.product.stock < 0:
@@ -101,10 +99,15 @@ def cartView(request):
             elif coupon_details.minimum_amount < cart_total:
                 if coupon_details.discount_type == 0:
                     if coupon_details.uses_remaining>0:
+                        if coupon_details.discount > total_subtotal:
+                            messages.error(request,"You can't able to use this coupon!!.Please add more prodcucts.")
+                            return redirect('index')
                         cart_total-=coupon_details.discount
                         coupon_applied=True
                         coupon_details.uses_remaining-=1
-                        coupon_details.discount_amount=coupon_details.discount
+                        if coupon_details.discount_amount is None:
+                            coupon_details.discount_amount=0.0
+                        coupon_details.discount_amount+=float(coupon_details.discount)
                         cart_item.subtotal-=coupon_details.discount
                         cart_item.save()
                         coupon_details.save()
@@ -117,7 +120,7 @@ def cartView(request):
                         cart_total=int(cart_total-((cart_total*coupon_details.discount)/100))
                         coupon_applied=True
                         coupon_details.uses_remaining-=1
-                        coupon_details.discount_amount=discount_percentage
+                        coupon_details.discount_amount+=float(discount_percentage)
                         coupon_details.save()
                         cart_item.subtotal-=discount_percentage
                         cart_item.save()
@@ -143,7 +146,7 @@ def cartView(request):
     }
     return render(request,'cart/cart.html',context=context)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')   
 def addtoCart(request, product_id):
     user_cart = get_or_create_cart(request)
@@ -179,7 +182,7 @@ def addtoCart(request, product_id):
 
     return redirect(cartView)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removefromCart(request, product_id):
     user_cart = get_or_create_cart(request)
@@ -188,13 +191,7 @@ def removefromCart(request, product_id):
     # Check if the item is in the cart
     cart_item = CartItem.objects.filter(cart=user_cart, product=product, is_active=True).first()
 
-    # if not request.user.is_authenticated:
-    #     # For non-authenticated users, remove the item from the session
-    #     cart_items = request.session.get('cart_items', [])
-    #     updated_cart_items = [item for item in cart_items if item['product_id'] != str(product_id)]
-    #     request.session['cart_items'] = updated_cart_items
-
-    # If the item is in the cart, decrease quantity or remove it completely
+    
     if cart_item:
         if cart_item.quantity > 0:
             cart_item.quantity -= 1
@@ -206,7 +203,7 @@ def removefromCart(request, product_id):
 
     return redirect(cartView)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removeButton(request,product_id):
     user_cart = get_or_create_cart(request)
@@ -220,11 +217,7 @@ def removeButton(request,product_id):
 
     return redirect(cartView)
 
-# def orderItems(request):
-
-#     return render(request,'cart/checkout.html')
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def checkoutView(request):
 
@@ -258,6 +251,7 @@ def checkoutView(request):
     for tot in cart_items:
         subtotal=round(float(subtotal+tot.subtotal),2)
         original_price+=tot.product.price
+        # print(original_price)
     if subtotal<1000:
         shipping_charge=2
     else:
@@ -265,29 +259,10 @@ def checkoutView(request):
     user_order.total_price=subtotal+shipping_charge
     
     total_discount=round(float(original_price)-subtotal,2)
+    # print(total_discount)
     user_order.total_discount=total_discount
     user_order.save()
 
-    # filtered_address=None
-
-    # razor_context = {}
-
-    # currency='INR'
-
-    # amount=(user_order.total_price)
-
-    # razorpay_merchant_key=settings.RAZORPAY_KEY_ID
-
-    # callback_url = 'paymenthandler/'
-
-    # client = razorpay.Client(
-    #     auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-
-
-    # payment = client.order.create(
-    #     {"amount": float(amount), "currency": "INR", "payment_capture": 1}
-    # )
-    
     if request.method=='POST':
 
         if request.POST.get('submit_type') == 'select_address':
@@ -297,9 +272,7 @@ def checkoutView(request):
             selected_address = Address.objects.get(id=selected_address_id)
             addr=selected_address.street_address+','+selected_address.city+','+selected_address.district+','+selected_address.state+','+selected_address.country+',Zip:'+selected_address.zip_code
             user_order.order_address=addr
-            # filtered_address=Address.objects.filter(user_id=user_order.customer_id).exclude(id=selected_address.id)
-            # for i in filtered_address:
-            #     print(i.id,i.street_address)
+    
             user_order.address=selected_address
             user_order.save()
 
@@ -307,63 +280,58 @@ def checkoutView(request):
         elif request.POST.get('submit_type') == 'place_order' :
 
             if user_order.address is None:  # Check if address is not selected
-                return HttpResponseBadRequest("Please select an address before placing the order.")
+                messages.error(request,"Please select an address before placing the order.")
+                return redirect(request.path)
             
             payment=request.POST.get('payment')
             # print(payment)
             user_order.payment_method = payment
             
             if not user_order.payment_method:
-                print(user_order.payment_method)
+                # print(user_order.payment_method)
                 messages.error(request,"Please select a payment method to place the order.")
         
             if payment is not None:
+
                 
                 if user_order.payment_method == '0' :
-                    print('hii')
                     messages.success(request,'You are redirecting into payment page')
                     return redirect(paymenthandler)
+                elif user_order.payment_method == '2':
+                    wallet_amount, created =Wallet.objects.get_or_create(user=user_order.customer)
+                    if wallet_amount.balance < user_order.total_price:
+                        messages.error(request,'You have in suficient wallet amount. please add some money in wallet')
+                        return redirect(wallet)
+                    else:
+                        user_order.payment_method = payment
+                        wallet_amount.balance-=Decimal(user_order.total_price)
+                        wallet_amount.save()
+                        user_order.complete = True
+                        messages.success(request,'Successfully placed the order.')
+                        user_order.save()
 
-                if user_order.payment_method != '0':               
+                # if user_order.payment_method != '0':
+                else:               
                     user_order.payment_method = payment
                     user_order.complete = True
+                    messages.success(request,'Successfully placed the order.')
                     user_order.save()
-                
-
-                # if payment == '0' :
-
-                #     print('hi')
-
-                #     currency = 'INR'
-                #     amount = user_order.total_price
-                
-                #     # Create a Razorpay Order
-                #     razorpay_order = client.order.create(dict(amount=amount,
-                #                                                     currency=currency,
-                #                                                     payment_capture='0'))
-                
-                #     # order id of newly created order.
-                #     razorpay_order_id = razorpay_order['id']
-                #     print(razorpay_order_id)
-                #     callback_url = 'paymenthandler/'
-                
-                #     # we need to pass these details to frontend.
-                    
-                #     # 'razorpay_order_id' = razorpay_order_id
-                #     razor_context['razorpay_merchant_key'] = settings.RAZORPAY_KEY_ID
-                #     razor_context['razorpay_amount'] = amount
-                #     razor_context['currency'] = currency
-                #     razor_context['callback_url'] = callback_url
                 
                 
                 if cart_items:
                     for cart in cart_items:
+                        offer_price= cart.product.price - cart.product.discounted_price
+                        coupon_offer= cart.product.discounted_price - Decimal(cart.subtotal)
+                        # print(offer_price)
                         ordered_product, created = OrderItem.objects.get_or_create(
                             quantity=cart.quantity,
                             amount=cart.subtotal,
                             order_id=user_order.id,
-                            product_id=cart.product_id
+                            product_id=cart.product_id,
+                            offer_price=offer_price,
+                            coupon_price=coupon_offer
                         )
+                        print(ordered_product.amount,cart.product.price,cart.product.discounted_price)
 
                         # Update the original stock
                         if not created:
@@ -389,12 +357,7 @@ def checkoutView(request):
         'payment_method':payment_method,
         # 'filtered_address':filtered_address,
         'categorys':category,
-        # 'razor_context':razor_context,
-        # 'currency':currency,
-        # 'razorpay_merchant_key':razorpay_merchant_key,
-        # 'callback_url':callback_url,
-        # 'razorpay_order_id':razorpay_order_id,
-        # 'payment':payment,
+
     }  
     
     return render(request,'cart/checkout.html',context=context)
@@ -428,12 +391,10 @@ def addtoWishlist(request, product_id):
 
     wishlist_item.in_wishlist=True
     wishlist_item.save()
-    # else:
-    #     messages.error(request,"There is no sufficient quantity of this products.")
 
     return redirect(wishlistView)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def wishlistToCart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -452,7 +413,7 @@ def wishlistToCart(request, product_id):
     
     return redirect(cartView)  # Redirect to the cart page
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removeWishlist(request,product_id):
     user_wishlist= Wishlist.objects.get(user_id=request.user.usermodel.id)
@@ -468,7 +429,7 @@ def removeWishlist(request,product_id):
 
     return redirect(wishlistView)
     
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def wallet(request):
     wallet,created=Wallet.objects.get_or_create(user_id=request.user.usermodel.id)
@@ -478,35 +439,18 @@ def wallet(request):
     if request.method=='POST':
         money=int(request.POST.get('money'))
         wallet.balance+=int(money)
+        wallet.save()
     return render(request,'cart/wallet.html',context=context)
 
-
-# def payment(request):
-
-#     if request.method='POST' and :
-#     # Create Razorpay order and redirect to payment page
-#                 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
-#                 razorpay_amount = int(user_order.total_price * 100)  # Convert to paisa
-#                 payment_data = {
-#                     "amount": razorpay_amount,
-#                     "currency": "INR",
-#                     "payment_capture": 1
-#                 }
-#                 payment = client.order.create(payment_data)
-#     return render(request,'cart/checkout.html',context=context)
-
-# def razorpayView(request):
-
-#     return render(request,'cart/checkout.html')
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @csrf_exempt
+@login_required(login_url='/userlog/')
 def paymenthandler(request):
     user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
     cart_data = Cart.objects.get(user_id=request.user.usermodel.id)
     cart_items = CartItem.objects.filter(cart_id=cart_data.id).exclude(quantity=0)
     if user_order:
         amount=int(user_order.total_price)*100
-        print(amount)
         payment = client.order.create(dict(amount=amount,currency='INR',payment_capture='1'))
   
     user_order.payment_method = 0
@@ -515,11 +459,15 @@ def paymenthandler(request):
     
     if cart_items:
         for cart in cart_items:
+            offer_price= cart.product.price - cart.product.discounted_price
+            coupon_offer= cart.product.discounted_price - Decimal(cart.subtotal)
             ordered_product, created = OrderItem.objects.get_or_create(
                 quantity=cart.quantity,
                 amount=cart.subtotal,
                 order_id=user_order.id,
-                product_id=cart.product_id
+                product_id=cart.product_id,
+                offer_price=offer_price,
+                coupon_price=coupon_offer
             )
 
             # Update the original stock
@@ -532,70 +480,43 @@ def paymenthandler(request):
             product.stock -= cart.quantity
             product.save()
         CartItem.objects.filter(cart_id=cart_data.id).delete()
-        # return redirect('index')
-    
- 
-    # only accept POST request.
-    # if request.method == "POST" :
-    #     user_order = Order.objects.get(customer_id=request.user.usermodel.id)
-    #     try:
-           
-    #         # get the required parameters from post request.
-    #         payment_id = request.POST.get('razorpay_payment_id', '')
-    #         razorpay_order_id = request.POST.get('razorpay_order_id', '')
-    #         signature = request.POST.get('razorpay_signature', '')
-    #         params_dict = {
-    #             'razorpay_order_id': razorpay_order_id,
-    #             'razorpay_payment_id': payment_id,
-    #             'razorpay_signature': signature
-    #         }
- 
-    #         # verify the payment signature.
-    #         result = razorpay_client.utility.verify_payment_signature(
-    #             params_dict)
-    #         if result is not None:
-    #             amount = (user_order.total_price)*100
-    #             try:
- 
-    #                 # capture the payemt
-    #                 razorpay_client.payment.capture(payment_id, amount)
- 
-    #                 # render success page on successful caputre of payment
-    #                 return render(request, 'cart/paymentsuccess.html')
-    #             except:
-    #                 # if there is an error while capturing payment.
-    #                 return render(request, 'cart/paymentfail.html')
-    #         else:
- 
-    #             # if signature verification fails.
-    #             return render(request, 'cart/paymentfail.html')
-    #     except:
- 
-    #         # if we don't find the required parameters in POST data
-    #         return HttpResponseBadRequest()
-    # else:
-    #    # if other than POST request is made.
-    #     return HttpResponseBadRequest()
+      
     context={
         'amount':amount,
         'payment':payment,
     }
     return render(request,'cart/razorpay.html',context=context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')    
 def removeCoupon(request,pk):
     user_cart= Cart.objects.get(user_id=request.user.usermodel.id)
     cart_items = CartItem.objects.filter(cart=user_cart,is_active=True)   
     code=Coupon.objects.get(pk=pk)
-    for cart_item in cart_items:
-        cart_item.subtotal += cart_item.product.price * cart_item.quantity
-        cart_item.save()
+    if code.discount_type == 1:
 
+        for cart_item in cart_items:
+            i=cart_item.product.discounted_price
+            if i < 1000:
+                add=2
+            else:
+                add=0
+            cart_item.subtotal += float(((cart_item.product.discounted_price+add)*(code.discount))/100)
+            cart_item.save()
+        code.discount_amount-=(((cart_item.subtotal+2)*float(code.discount))/100)
+        code.uses_remaining+=1
+        code.save()
+    elif code.discount_type == 0:
+        for cart_item in cart_items:
+            cart_item.subtotal += float(code.discount)
+            cart_item.save()
+        code.discount_amount-=float(code.discount)
+        code.uses_remaining+=1
+        code.save()
 
-    code.discount_amount=0
-    code.uses_remaining+=1
-    code.save()
 
     return redirect(cartView)
     
     return render(request,'cart/cart.html')
+
+

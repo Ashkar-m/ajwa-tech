@@ -48,17 +48,30 @@
 
         </div>
         <div class="col-lg-3 col-6 text-right">
-            <a href="" class="btn border">
+            <a href="{% url 'wallet' %}" class="btn border">
+                <i class="fas fa-wallet text-primary"></i>  
+            </a>
+            <a href="{% url 'wishlist' %}" class="btn border">
+                <i class="fas fa-heart text-primary"></i>
+            </a>
+            <!-- <a href="{% url 'cart' %}" class="btn border">
+                <i class="fas fa-shopping-cart text-primary"></i>
+                <span class="badge"></span>
+            </a> -->
+            <a href="{% url 'userprofile' %}" class="btn border">
+                <i class="fas fa-solid fa-user text-primary"></i>
+            </a>
+            <!-- <a href="" class="btn border">
                 <i class="fas fa-heart text-primary"></i>
                 <span class="badge">0</span>
-            </a>
+            </a> -->
             <!-- <a href="" class="btn border">
                 <i class="fas fa-shopping-cart text-primary"></i>
                 <span class="badge">0</span>
             </a> -->
-            <a href="{% url 'userprofile' %}" class="btn border">
+            <!-- <a href="{% url 'userprofile' %}" class="btn border">
                 <i class="fas fa-solid fa-user"></i>
-            </a>
+            </a> -->
         </div>
     </div>
 </div>
@@ -268,7 +281,9 @@
                     {% endif %}
 
                     <div class="input-group-append">
+                        {% if not coupon_applied %}
                         <button type="submit" class="btn btn-primary">Apply Coupon</button>
+                        {% endif %}
                     </div>
                 </div>
             </form>
@@ -288,8 +303,8 @@
                     {% if coupon_applied %}
                     <div class="d-flex justify-content-between mt-3">
                         <h6 class="font-weight-medium">Coupon amount</h6>
-                        {% if coupon_applied.discount_type == 0 %}
-                        <h6 class="font-weight-medium">{{ coupon_details.discount }}</h6>
+                        {% if coupon_applied and coupon_details.discount_type == 0 %}
+                        <h6 class="font-weight-medium">{{ coupon_details.discount_amount }}</h6>
                         {% else %}
                         <h6 class="font-weight-medium">{{ discount_percentage }}</h6>
                         {% endif %}

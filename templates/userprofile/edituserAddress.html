@@ -215,6 +215,9 @@
                     },
                     zip_code:{
                         required: true,
+                        minlength: 6, // Minimum length of 6 digits
+                        maxlength: 6, // Maximum length of 6 digits
+                        min: 111111,
                         validNumber: true,
                     }
                 },
@@ -256,7 +259,7 @@
             $.validator.addMethod(
                 "validNumber",
                 function (value, element) {
-                    return /^\d+(\.\d+)?$/.test(value);
+                    return /^(111111|\d{6,})$/.test(value);
                 },
                 "Please enter a valid product price (non negative number)."
             );

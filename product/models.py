@@ -82,43 +82,41 @@ class Product(models.Model):
                 discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
                 discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
                 
-                self.discounted_price=min(discounted_price_prod, discounted_price_cat).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return min(discounted_price_prod, discounted_price_cat).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             
             elif pro_offer.available and not cat_offer.available:
                 discount_percentage_prod = Decimal(pro_offer.percentage) / 100
                 discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
-                self.discounted_price=discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             
             elif not pro_offer.available and cat_offer.available:
                 discount_percentage_cat = Decimal(cat_offer.percentage) / 100
                 discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
-                self.discounted_price=discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             
             else:
-                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         elif pro_offer:
             if pro_offer.available:
                 discount_percentage_prod = Decimal(pro_offer.percentage) / 100
                 discounted_price_prod = self.price * (Decimal('1') - discount_percentage_prod)
-                self.discounted_price=discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return discounted_price_prod.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             else:
-                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         elif cat_offer:
             if cat_offer.available:
                 discount_percentage_cat = Decimal(cat_offer.percentage) / 100
                 discounted_price_cat = self.price * (Decimal('1') - discount_percentage_cat)
-                self.discounted_price=discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return discounted_price_cat.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
             else:
-                self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+                return self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
         else:
-            self.discounted_price=self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            return self.price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         
-        self.save()
-
-
+        
 
 class ProductImage(models.Model):
     product=models.ForeignKey(Product,on_delete=models.CASCADE,related_name='images')

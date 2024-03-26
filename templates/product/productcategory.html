@@ -34,9 +34,9 @@
                 </a>
             </div>
             <div class="col-lg-6 col-6 text-left">
-                <form action="">
+                <form method="get" action="{% url 'search' %}">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for products">
+                        <input type="text" class="form-control" placeholder="Search for products" name="q">
                         <div class="input-group-append">
                             <span class="input-group-text bg-transparent text-primary">
                                 <i class="fa fa-search"></i>
@@ -46,13 +46,18 @@
                 </form>
             </div>
             <div class="col-lg-3 col-6 text-right">
-                <a href="" class="btn border">
-                    <i class="fas fa-heart text-primary"></i>
-                    <span class="badge">0</span>
+                <a href="{% url 'wallet' %}" class="btn border">
+                    <i class="fas fa-wallet text-primary"></i>  
                 </a>
-                <a href="" class="btn border">
+                <a href="{% url 'wishlist' %}" class="btn border">
+                    <i class="fas fa-heart text-primary"></i>
+                </a>
+                <a href="{% url 'cart' %}" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge"></span>
+                </a>
+                <a href="{% url 'userprofile' %}" class="btn border">
+                    <i class="fas fa-solid fa-user text-primary"></i>
                 </a>
             </div>
         </div>
@@ -110,10 +115,10 @@
 
     {% block shopitem %}
     <div class="container-fluid pt-5">
-        <div class="row px-xl-5">
-            <!-- Shop Sidebar Start -->
-            <div class="col-lg-3 col-md-12">
-                <!-- Price Start -->
+        <div class="row px-xl-4">
+            
+            <!-- <div class="col-lg-3 col-md-12">
+                
                 <div class="border-bottom mb-4 pb-4">
                     <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
                     <form>
@@ -149,9 +154,7 @@
                         </div>
                     </form>
                 </div>
-                <!-- Price End -->
                 
-                <!-- Color Start -->
                 <div class="border-bottom mb-4 pb-4">
                     <h5 class="font-weight-semi-bold mb-4">Filter by color</h5>
                     <form>
@@ -187,9 +190,7 @@
                         </div>
                     </form>
                 </div>
-                <!-- Color End -->
-    
-                <!-- Size Start -->
+                
                 <div class="mb-5">
                     <h5 class="font-weight-semi-bold mb-4">Filter by size</h5>
                     <form>
@@ -225,25 +226,22 @@
                         </div>
                     </form>
                 </div>
-                <!-- Size End -->
-            </div>
-            <!-- Shop Sidebar End -->
-    
-    
-            <!-- Shop Product Start -->
-            <div class="col-lg-9 col-md-12">
+                
+            </div> -->
+            
+            <div class="col-lg-12 col-md-12">
                 <div class="row pb-3">
                     <div class="col-12 pb-1">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <form action="">
-                                <div class="input-group">
+                                <!-- <div class="input-group">
                                     <input type="text" class="form-control" placeholder="Search by name">
                                     <div class="input-group-append">
                                         <span class="input-group-text bg-transparent text-primary">
                                             <i class="fa fa-search"></i>
                                         </span>
                                     </div>
-                                </div>
+                                </div> -->
                             </form>
                             <div class="dropdown ml-4">
                                 <button class="btn border dropdown-toggle" type="button" id="triggerId" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -262,8 +260,10 @@
                     {% for product in products %}
                     
                     
-                    <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                    <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                        
                         <div class="card product-item border-0 mb-4">
+                            
                             <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                             
                                
@@ -287,12 +287,12 @@
                             </div>
                         </div>
                     </div>
-                    
+                
                     
                     {% endfor %}
     
                    
-                    <div class="col-12 pb-1">
+                    <!-- <div class="col-12 pb-1">
                         <nav aria-label="Page navigation">
                           <ul class="pagination justify-content-center mb-3">
                             <li class="page-item disabled">
@@ -312,10 +312,10 @@
                             </li>
                           </ul>
                         </nav>
-                    </div>
+                    </div> -->
                 </div>
             </div>
-            <!-- Shop Product End -->
+            
         </div>
     </div>
     

@@ -202,23 +202,37 @@
                                 <table class="table table-bordered text-center mb-0">
                                     <thead class="bg-secondary text-dark">
                                         <tr>
+                                            <th>Product image</th>
                                             <th>Products</th>
                                             <th>Trasaction id</th>
                                             <th>Order status</th>
                                             <th>Payment method</th>
                                             <th>Date ordered</th>
                                             <th>Price</th>
-                                            <th>Cancel Status</th>
+                                            <!-- <th>Cancel Status</th> -->
                                             <th>Cancel</th>
+                                            <th>Return</th>
                                         </tr>
                                     </thead>
                                     <tbody class="align-middle">
                                         {% for order in ordered_items %}
                                         <tr>
+                                            <td>{% for order_item in order.order_items.all %}
+                                                {% for image in order_item.product.images.all|slice:":1" %}
+                                                <img src="{{image.image.url}}" alt="" style="height: 35px;">
+                                            
+                                            {% endfor %}
+                                            {% endfor %}
+                                        </td>
                                         <td class="align-middle">
                                             {% if order.id %}
                                             <a href="{% url 'orderdetail' order_id=order.id %}">
                                             {% for order_item in order.order_items.all %}
+                                            <!-- {% for image in order_item.product.images.all|slice:":1" %}
+                                            
+                                             <img src="{{image.image.url}}" alt="" style="height: 25px;">
+                                            
+                                            {% endfor %} -->
                                                 {{ order_item.product.name }} X {{ order_item.quantity }}
                                                 <!-- Add any additional product information as needed -->
                                                 <br>
@@ -232,6 +246,7 @@
                                             {% elif order.Order_status == 1 %}Shipped
                                             {% elif order.Order_status == 2 %}Delivery
                                             {% elif order.Order_status == 3 %}Cancel
+                                            {% elif order.Order_status == 4 %}Return
                                             {% else %}Invalid
                                             {%endif%}</td>
                                         <td class="align-middle">{% if order.payment_method == 0 %} Razorpay
@@ -241,9 +256,11 @@
                                             {%endif%}</td>
                                         <td class="align-middle">{{ order.date_ordered  }}</td>
                                         <td class="align-middle">{{ order.total_price}}</td>
-                                        <td class="align-middle">{% if order.is_cancel %}Cancelled{% else %}Not cancelled {% endif %}</td>
+                                        <!-- <td class="align-middle">{% if order.is_cancel %}Cancelled{% else %}Not cancelled {% endif %}</td> -->
                                         {% if order.Order_status == 2  %}
                                         <td class="align-middle"><a href="">Delivered</a></td>
+                                        {% elif order.Order_status == 4 %}
+                                        <td class="align-middle"><a href="">Returned</a></td>
                                         {% elif order.payment_status == 2 %}
                                         <td class="align-middle"><a href="">Payment Failed</a></td>
                                         {% elif order.is_cancel %}
@@ -253,7 +270,17 @@
                                             <a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a>
                                         </td>
                                         <!-- <td class="align-middle"><a href="{% url 'cancelorder' pk=order.id %}">cancel</a></td> -->
+                                        
                                         {% endif %}
+                                        <td class="align-middle">
+                                            {% if order.Order_status == 2  %}
+                                            <a href="#" class="return-order" data-order-id="{{ order.id }}">Return</a>
+                                            {% elif order.Order_status == 4 %}
+                                            <a href="" class="" >Returned</a>
+                                            {% else %}
+                                            <a href="" class="" >-----</a>
+                                            {% endif %}
+                                        </td>
                                     </tr>
                                         
                                             {% endfor %}
@@ -291,6 +318,17 @@
                 var orderId = $(this).data("order-id");
                 if (confirm("Are you sure you want to cancel this order?")) {
                     window.location.href = "{% url 'cancelorder' pk=0 %}".replace('0', orderId);
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $(".return-order").on("click", function(e) {
+                e.preventDefault();
+                var orderId = $(this).data("order-id");
+                if (confirm("Are you sure you want to Return this order?")) {
+                    window.location.href = "{% url 'returnorder' pk=0 %}".replace('0', orderId);
                 }
             });
         });

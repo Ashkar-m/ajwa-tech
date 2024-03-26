@@ -20,6 +20,9 @@ from django.contrib import messages
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
     product=Product.objects.all()
+    for i in product:
+        i.discounted_price=i.calculate_discounted_price()
+        i.save()
     category = Category.objects.all().order_by('name').annotate(total_products=Count('product'))
     context={'products':product,'categorys':category}
 
@@ -28,6 +31,9 @@ def index(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def shop(request):
     product_list=Product.objects.all()
+    for i in product_list:
+        i.discounted_price=i.calculate_discounted_price()
+        i.save()
     category_list=Category.objects.all()
     sort_option = request.GET.get('sort', 'name_asc')
 
@@ -62,6 +68,10 @@ def shop(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def detail(request,slug):
     product=Product.objects.get(slug=slug)
+    
+    product.discounted_price=product.calculate_discounted_price()
+    product.save()
+
     category=product.category
     related_product=Product.objects.filter(category=category).exclude(slug=slug)
     product_description_split = product.description.split(';')

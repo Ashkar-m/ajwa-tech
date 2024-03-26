@@ -11,4 +11,5 @@ urlpatterns = [
     path('socialaccount/',views.socialAccount,name='socialaccount'),
     path('orderdetail/<int:order_id>',views.orderDetail,name='orderdetail'),
     path('changepassword',views.changePassword,name='changepassword'),
+    path('returnorder/<pk>',views.returnOrder,name='returnorder'),
 ]

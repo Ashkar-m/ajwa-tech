@@ -64,7 +64,7 @@
                 </div>
                 <small class="pt-1">(50 Reviews)</small>
             </div>
-            <h3 class="font-weight-semi-bold mb-4">{{ product.price }}</h3>
+            <h3 class="font-weight-semi-bold mb-4">{{ product.discounted_price }}</h3>
             {% for part in product_description %}
                         <ul>
                             {% if not loop.last %}
@@ -77,7 +77,7 @@
                 <h3 class="font-weight-semi-bold mb-4">Product Unavailable</h3>
             {% elif product.available and product.stock > 0 %}
             <div class="d-flex align-items-center mb-4 pt-2">
-                <div class="input-group quantity mr-3" style="width: 130px;">
+                <!-- <div class="input-group quantity mr-3" style="width: 130px;">
                     <div class="input-group-btn">
                         <button class="btn btn-primary btn-minus">
                         <i class="fa fa-minus"></i>
@@ -89,7 +89,7 @@
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
-                </div>
+                </div> -->
                 <a href="{% url 'addtocart' product_id=product.id %}"><button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button></a>
             </div>
             {% else %}

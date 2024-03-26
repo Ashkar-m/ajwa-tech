@@ -110,7 +110,12 @@
                         <div class="col-md-12">
                             <h2>Order Detail</h2>
                             <div class="order-detail">
-                                <div class="detail"><strong>Product:</strong> {% for order_item in order.order_items.all %}{{ order_item.product.name }}{% endfor %}</div>
+                                <div class="detail"><strong>Product Images:</strong> {% for order_item in order.order_items.all %}
+                                    {% for Images in order_item.product.images.all %}
+                                    <img src="{{Images.image.url}}" alt="" style="height: 80px;">
+                                    {% endfor %}
+                                    {% endfor %}</div>
+                                <div class="detail mt-4"><strong>Product:</strong> {% for order_item in order.order_items.all %}{{ order_item.product.name }}{% endfor %}</div>
                                 <div class="detail"><strong>Quantity:</strong> {% for order_item in order.order_items.all %}{{ order_item.quantity }}{% endfor %}</div>
                                 <div class="detail"><strong>Transaction ID:</strong> {{ order.transaction_id }}</div>
                                 <div class="detail">
@@ -123,6 +128,8 @@
                                     Delivered
                                     {% elif order.Order_status == 3 %}
                                     Cancelled
+                                    {% elif order.Order_status == 4 %}
+                                    Returned
                                     {% else %}
                                     Invalid
                                     {% endif %}
@@ -149,7 +156,37 @@
                                     Not Cancelled
                                     {% endif %}
                                 </div> -->
-                                <div class="detail"><strong><a href="">cancel</a></strong></div>
+                                {% if order.Order_status == 2  %}
+                                        <td class="align-middle"><a href="">Delivered</a></td>
+                                        {% elif order.payment_status == 2 %}
+                                        <td class="align-middle"><a href="">Payment Failed</a></td>
+                                        {% elif order.Order_status == 4 %}
+                                        <td class="align-middle"><a href=""></a></td>
+                                        {% elif order.is_cancel %}
+                                        <td class="align-middle"><a href="">cancelled</a></td>
+                                        {% else %}
+                                        <td class="align-middle">
+                                            <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
+                                        </td>
+                                        <!-- <td class="align-middle"><a href="{% url 'cancelorder' pk=order.id %}">cancel</a></td> -->
+                                        
+                                        {% endif %}
+                                <!-- <td class="align-middle">
+                                    <a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a>
+                                </td> -->
+                                <!-- <td class="align-middle">
+                                    <a href="{% url 'returnorder' pk=order.id %}">Return</a>
+                                </td> -->
+                                <td class="align-middle">
+                                    {% if order.Order_status == 2  %}
+                                    <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
+                                    {% elif order.Order_status == 4 %}
+                                    <a href="" class="" >Returned</a>
+                                    {% else %}
+                                    <a href="" class="" ><br></a>
+                                    {% endif %}
+                                </td>
+                                
                             </div>
                         </div>
                     </div>
@@ -178,6 +215,18 @@
             });
         });
     </script>
+    <script>
+        $(document).ready(function() {
+            $(".return-order").on("click", function(e) {
+                e.preventDefault();
+                var orderId = $(this).data("order-id");
+                if (confirm("Are you sure you want to return this order?")) {
+                    window.location.href = "{% url 'returnorder' pk=0 %}".replace('0', orderId);
+                }
+            });
+        });
+    </script>
+    
 </body>
 
 

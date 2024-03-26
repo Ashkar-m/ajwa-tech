@@ -72,14 +72,21 @@ class Order(models.Model):
             self.transaction_id = f"{timestamp}-{random_number}"
         super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.transaction_id
+
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE,related_name='order_items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='order_product')
     quantity = models.IntegerField(default=0, null=True, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
+    offer_price = models.DecimalField(null=True,blank=True,default=0.0,decimal_places=2,max_digits=15)
+    coupon_price = models.DecimalField(null=True,blank=True,default=0.0,decimal_places=2,max_digits=15)
     amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     updated_at=models.DateField(auto_now=True)
 
+    def __str__(self):
+        return self.product.name
 
 
 
@@ -121,7 +128,7 @@ class Coupon(models.Model):
     minimum_amount = models.IntegerField()
     discount_type = models.IntegerField(choices=DISCOUNT_TYPE)
     discount = models.DecimalField(max_digits=7, decimal_places=2)
-    discount_amount=models.FloatField(null=True,blank=True)
+    discount_amount=models.FloatField(null=True,blank=True,default=0.0)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     active = models.BooleanField(default=True)

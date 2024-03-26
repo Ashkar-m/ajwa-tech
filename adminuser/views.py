@@ -862,18 +862,43 @@ def retainCoupon(request,pk):
 
 # --------------------------------------------------------------------Admin sales report----------------------------------------------------------------
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='adminlog')
 def adminIndex(request):
-    end_date = datetime.now()
-    day=30
+    # end_date = datetime.now()
+    # # print(end_date)
+    # day=30
+    # start_date_str = request.POST.get('start_date')
+    
+    # sample_date=None
+    # if start_date_str:
+    #     sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    # if sample_date:
+    #     day=(end_date-sample_date).days
+    # start_date = end_date - timedelta(days=day)
+    
+    end_date_str = request.POST.get('end_date')  # Assuming 'end_date' is the name of the input field for end date
+
+    if end_date_str:
+        try:
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+        except ValueError:
+            messages.error(request,'An error occured')
+    else:
+        end_date = datetime.now()
+    print(end_date)
+    day = 30  # Default value for days if start_date is not provided
+
     start_date_str = request.POST.get('start_date')
-    print(start_date_str)
-    sample_date=None
     if start_date_str:
-        sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-    if sample_date:
-        day=(end_date-sample_date).days
+        try:
+            sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+            day = (end_date - sample_date).days
+        except ValueError:
+            messages.error(request,'An error occured')
+
     start_date = end_date - timedelta(days=day)
+    print(start_date)
 
     prod = Product.objects.all()
     orders_within_range = Order.objects.filter(
@@ -883,7 +908,7 @@ def adminIndex(request):
     order_item = OrderItem.objects.all()
     total_order_items = OrderItem.objects.count()
 
-    order = Order.objects.all().order_by('-date_ordered')[:5]
+    order = Order.objects.filter(complete=True).order_by('-date_ordered')[:5]
 
     daily_order_data = Order.objects.annotate(date=TruncDate('date_ordered')).values(
         'date').annotate(order_count=Count('id')).order_by('date')
@@ -893,9 +918,80 @@ def adminIndex(request):
     current_year = datetime.now().year
     orders_count = Order.objects.filter(Order_status='2',date_ordered__range=(start_date, end_date)).count()
 
+    # coupons
+    coupons=Coupon.objects.all().order_by('-discount_amount')[:5]
     total_coupons=Coupon.objects.aggregate(coupon_sum=Sum('discount_amount'))
-    print(total_coupons)
+
+    total_offer_amount = orders_within_range.filter(Order_status='2').aggregate(
+        total_offers=Sum('total_discount'))['total_offers']
+
+    # payment type 
     
+    payment_types = orders_within_range.filter(Order_status='2').values('payment_method').annotate(total_payment=Sum('total_price'))
+
+    # total product discounts 
+    overall_discount = orders_within_range.filter(Order_status='2').aggregate(total_discount=Sum('total_discount'))
+    
+    # top products
+    from collections import Counter
+    product_counts = Counter()
+    orders=orders_within_range.filter(Order_status='2')
+    for ordered_pro in orders:
+        ordered_product = OrderItem.objects.filter(order=ordered_pro)
+        # print(ordered_product)
+        for product_calculation in ordered_product:
+            product_counts[(product_calculation.product.name, product_calculation.product.category.name, product_calculation.product.price)] += 1  # Assuming 'product_name' is the field containing the product name
+
+    # Sort products based on their counts in descending order
+    sorted_products = sorted(product_counts.items(), key=lambda x: x[1], reverse=True)
+    sorted_product_data = [{'name': item[0][0], 'category': item[0][1], 'price': item[0][2], 'count': item[1]} for item in sorted_products]
+
+
+    # top 5 products
+    category_counts = Counter()
+    for ordered_cat in orders:
+        ordered_category = OrderItem.objects.filter(order=ordered_cat)
+        # print(ordered_product)
+        for category_calculation in ordered_category:
+            category_counts[(category_calculation.product.category.name)] += 1
+        
+    category_product_counts = dict(category_counts)
+    sorted_category_product_counts = dict(sorted(category_product_counts.items(), key=lambda item: item[1], reverse=True))
+    sorted_category_data = [{'category': category, 'count': count} for category, count in sorted_category_product_counts.items()]
+
+    # total proudcts sold  unit sold price that sold offer price
+
+    # First, get the queryset of orders with Order_status='2' and the specified date range
+    offers = Order.objects.filter(Order_status='2', date_ordered__range=(start_date, end_date))
+
+    # Next, annotate the queryset to get the count of each product, offer_price, and coupon_price
+    offers = offers.values('order_items__product__id', 'order_items__product__name').annotate(
+        count=Count('id'),
+        total_offer_price=Sum('order_items__offer_price'),
+        total_coupon_price=Sum('order_items__coupon_price'),
+        product_price=Max('order_items__product__price')
+    ).order_by('order_items__product__name')
+
+    # Now, you can loop through the queryset to access each product's count, offer_price, and coupon_price
+    for offer in offers:
+        product_name = offer['order_items__product__name']
+        # product_price = offer['order_items__product__price']
+        product_price = offer['product_price']
+        # product_category = offer['order_items__product__category__name']
+        product_count = offer['count']
+        total_offer_price = offer['total_offer_price']
+        total_coupon_price = offer['total_coupon_price']
+
+        # # Do whatever you need with the data, such as printing or storing it
+        # print(f"Product: {product_name}, Price: {product_price}, Count: {product_count}, Total Offer Price: {total_offer_price}, Total Coupon Price: {total_coupon_price}")
+
+    # If you want the total offer_price and total coupon_price across all products, you can aggregate them again
+    total_offer_price_all_products = offers.aggregate(Sum('total_offer_price'))['total_offer_price__sum']
+    total_coupon_price_all_products = offers.aggregate(Sum('total_coupon_price'))['total_coupon_price__sum']
+
+    # print(f"Total Offer Price (All Products): {total_offer_price_all_products}")
+    # print(f"Total Coupon Price (All Products): {total_coupon_price_all_products}")
+
     
     context = {
         'orders_count': orders_count,
@@ -907,6 +1003,17 @@ def adminIndex(request):
         'data': data,
         'order': order,
         'total_coupons':total_coupons,
-         
+        'coupons':coupons,
+        'payment_types':payment_types,
+        'sorted_product_data':sorted_product_data,
+        'sorted_category_data':sorted_category_data,
+        # 'sorted_product_offer_data':sorted_product_offer_data,
+        'overall_discount':overall_discount,
+        'total_offer_price_all_products':total_offer_price_all_products,
+        'total_coupon_price_all_products':total_coupon_price_all_products,
+        'offers':offers,
+        'start_date': start_date,
+        'end_date': end_date,
+
     }
     return render(request, 'adminuser/admindemo.html', context)

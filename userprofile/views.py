@@ -288,6 +288,8 @@ def socialAccount(request):
 
     return render(request,'userprofile/socialaccount.html',context=context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def orderDetail(request,order_id):
     order = get_object_or_404(Order, id=order_id)
     for i in order.order_items.all():   
@@ -295,7 +297,8 @@ def orderDetail(request,order_id):
     context={'order': order}
     return render(request, 'userprofile/orderdetail.html',context=context)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def changePassword(request):
 
     user=request.user
@@ -325,3 +328,48 @@ def changePassword(request):
                 print(e)
             
     return render(request,'userprofile/changepassword.html')
+
+@login_required(login_url='/userlog/')
+def returnOrder(request,pk):
+    try:
+        order_item=Order.objects.get(pk=pk)
+        order_product=OrderItem.objects.filter(order_id=order_item.id)
+        order_item.Order_status='4'
+        order_item.save()
+        for i in order_product:
+            i.product.stock+=1
+            i.product.save()
+        # order_item.save()
+        messages.success(request,'Successfully Returned the proudcts')
+        return redirect('index')
+    except Exception as e:
+        messages.error(request,f'Error:{e}')
+    return redirect(userProfile)
+
+    # try:
+    #     cancel_order = Order.objects.prefetch_related('order_items__product').get(pk=pk)
+        
+    #     if cancel_order.is_cancel:
+    #         messages.error(request, "Order has already been cancelled.")
+    #     else:
+    #         with transaction.atomic():
+                 
+    #             cancel_order.is_cancel = True
+    #             cancel_order.save()
+
+    #             wallet , created =Wallet.objects.get_or_create(user_id=cancel_order.customer_id)
+    #             wallet.balance+=cancel_order.total_price
+    #             wallet.save()
+
+    #             for order_item in cancel_order.order_items.all():
+    #                 product = order_item.product
+    #                 product.stock += order_item.quantity  # Adding back the quantity to stock
+    #                 product.save()
+
+    #             messages.success(request, "Order canceled successfully")
+    # except Order.DoesNotExist:
+    #     messages.error(request, "Order does not exist.")
+    # # except Exception as e:
+    # #     messages.error(request, f"Error: {e}")
+
+

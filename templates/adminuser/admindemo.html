@@ -14,7 +14,9 @@
     <form method="POST">
         {% csrf_token %}
         <label for="start_date">Start Date:</label>
-        <input type="date" id="start_date" name="start_date" value="{{ display_date|date:'Y-m-d' }}">
+        <input type="date" id="start_date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+        <label for="start_date">End Date:</label>
+        <input type="date" id="start_date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
         <!-- <label for="start_date">End Date:</label>
         <input type="date" id="End_date" name="end_date" value="{{ start_date|date:'Y-m-d' }}"> -->
         <button type="submit">Apply</button>
@@ -31,33 +33,33 @@
         </div>
         <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
             <div class="dash-widget">
-                <span class="dash-widget-bg2"><i class="fa fa-user-o"></i></span>
+                <span class="dash-widget-bg2"><i class="fa-solid fa-dollar-sign"></i></span>
                 <div class="dash-widget-info text-right">
                     <h3>Total Earnings</h3>
-                    <span class="widget-title2">₹{{total_payment_amount}}</span>
+                    <span class="widget-title2">${{total_payment_amount}}</span>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
             <div class="dash-widget">
-                <span class="dash-widget-bg3"><i class="fa fa-user-md" aria-hidden="true"></i></span>
+                <span class="dash-widget-bg3"><i class="fa-solid fa-money-bill" aria-hidden="true"></i></span>
                 <div class="dash-widget-info text-right">
-                    <h3>Coupon Sum</h3>
-                    <span class="widget-title3">₹{{ total_coupons.coupon_sum }}</span>
+                    <h3>Coupon discount</h3>
+                    <span class="widget-title3">${{ total_coupon_price_all_products }}</span>
                 </div>
             </div>
         </div>
         <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
             <div class="dash-widget">
-                <span class="dash-widget-bg4"><i class="fa fa-heartbeat" aria-hidden="true"></i></span>
+                <span class="dash-widget-bg4"><i class="fa-solid fa-percentage" aria-hidden="true"></i></span>
                 <div class="dash-widget-info text-right">
-                    <h3>618</h3>
-                    <span class="widget-title4">Pending <i class="fa fa-check" aria-hidden="true"></i></span>
+                    <h3>Product Offers</h3>
+                    <span class="widget-title4">${{ total_offer_price_all_products }}</span>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
         <div class="col-12 col-md-6 col-lg-6 col-xl-6">
             <div class="card">
                 <div class="card-body"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
@@ -85,7 +87,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="row">
         <div class="col-12 col-md-6 col-lg-8 col-xl-8">
             <div class="card">
@@ -104,8 +106,10 @@
                                     <th class="text-right">Payment Method</th>
                                     <th>Price</th>
                                 </tr>
+                                {% for order in order %}
+                                {% if order.complete %}
                                 <tr>
-                                    {% for order in order %}
+                                    
                                     <td >
                                         <h2>{{forloop.counter}}</h2>
                                     </td>                 
@@ -114,10 +118,19 @@
                                     </td>
                                     <td><h5 class="time-title p-0">{{order.date_ordered}}</h5></td>
                                     <td class="text-right">
-                                        {{order.payment_method}}
+                                        {% if order.payment_method == 0 %}
+                                        Razropay
+                                        {% elif order.payment_method == 1 %}
+                                        Cash on delivery
+                                        {% elif order.payment_method == 2 %}
+                                        Upi
+                                        {% else %}
+                                        none
+                                        {% endif %}
                                     </td>
-                                    <td><h5 class="time-title p-0">{{order.total_price}}</h5></td>
+                                    <td><h5 class="time-title p-0">$&nbsp;{{order.total_price}}</h5></td>
                                 </tr>
+                                {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -128,137 +141,139 @@
         <div class="col-12 col-md-6 col-lg-4 col-xl-4">
             <div class="card member-panel">
                 <div class="card-header bg-white">
-                    <h4 class="card-title mb-0">Doctors</h4>
+                    <h4 class="card-title mb-0">Payment types</h4>
                 </div>
                 <div class="card-body">
                     <ul class="contact-list">
                         <li>
+                            {% for payment_types in payment_types %}
                             <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="John Doe"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status online"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">John Doe</span>
-                                    <span class="contact-date">MBBS, MD</span>
-                                </div>
+                                <span style="font-size: large;">{% if payment_types.payment_method == 0 %}Razorpay
+                                                                {% elif payment_types.payment_method == 1 %}Cash on delivery
+                                                                {% elif payment_types.payment_method == 2 %}Wallet
+                                                                {% endif %}
+                                </span>: <p class="font-size: x-large; display: inline-block; margin-bottom: 0;" style="font-size: x-large;">{{ payment_types.total_payment }}</p>
                             </div>
-                        </li>
-                        <li>
-                            <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="Richard Miles"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status offline"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">Richard Miles</span>
-                                    <span class="contact-date">MD</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="John Doe"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status away"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">John Doe</span>
-                                    <span class="contact-date">BMBS</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="Richard Miles"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status online"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">Richard Miles</span>
-                                    <span class="contact-date">MS, MD</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="John Doe"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status offline"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">John Doe</span>
-                                    <span class="contact-date">MBBS</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="contact-cont">
-                                <div class="float-left user-img m-r-10">
-                                    <a href="profile.html" title="Richard Miles"><img src="assets/img/user.jpg" alt="" class="w-40 rounded-circle"><span class="status away"></span></a>
-                                </div>
-                                <div class="contact-info">
-                                    <span class="contact-name text-ellipsis">Richard Miles</span>
-                                    <span class="contact-date">MBBS, MD</span>
-                                </div>
-                            </div>
+                            {% endfor %}
                         </li>
                     </ul>
-                </div>
-                <div class="card-footer text-center bg-white">
-                    <a href="doctors.html" class="text-muted">View all Doctors</a>
                 </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-12 col-md-6 col-lg-8 col-xl-8">
-            <div class="card">
+        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+            <!-- <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title d-inline-block">New Patients </h4> <a href="patients.html" class="btn btn-primary float-right">View all</a>
+                    <h4 class="card-title d-inline-block">Top 5 Coupons detail </h4> 
                 </div>
                 <div class="card-block">
                     <div class="table-responsive">
                         <table class="table mb-0 new-patient-table">
+                            
                             <tbody>
                                 <tr>
-                                    <td>
-                                        <img width="28" height="28" class="rounded-circle" src="assets/img/user.jpg" alt=""> 
-                                        <h2>John Doe</h2>
-                                    </td>
-                                    <td>Johndoe21@gmail.com</td>
-                                    <td>+1-202-555-0125</td>
-                                    <td><button class="btn btn-primary btn-primary-one float-right">Fever</button></td>
+                                    <th>Id</th>
+                                    <th>Coupon code</th>
+                                    <th>Discount type</th>
+                                    <th >Discount</th>
+                                    <th>Total Discount</th>
                                 </tr>
+                                {% for coupon in coupons %}
+                                
                                 <tr>
-                                    <td>
-                                        <img width="28" height="28" class="rounded-circle" src="assets/img/user.jpg" alt=""> 
-                                        <h2>Richard</h2>
+                                    
+                                    <td >
+                                        <h2>{{forloop.counter}}</h2>
+                                    </td>                 
+                                    <td><h5 class="time-title p-0">{{ coupon.coupon_code}}</h5>
+                                        
                                     </td>
-                                    <td>Richard123@yahoo.com</td>
-                                    <td>202-555-0127</td>
-                                    <td><button class="btn btn-primary btn-primary-two float-right">Cancer</button></td>
+                                    <td><h5 class="time-title p-0">{% if  coupon.discount_type == 0 %}
+                                        Amount
+                                        {% elif coupon.discount_type == 1 %}
+                                        Percentage
+                                        {% endif %}
+                                    </h5></td>
+                                    <td >
+                                        {% if  coupon.discount_type == 0 %}
+                                        $&nbsp;{{ coupon.discount }}
+                                        {% elif coupon.discount_type == 1 %}
+                                        {{ coupon.discount }}&nbsp;%
+                                        {% endif %}
+                                        
+                                    </td>
+                                    <td><h5 class="time-title p-0">{{ coupon.discount_amount }}</h5></td>
                                 </tr>
+                                
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> -->
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title d-inline-block">Top 5 Product selling Category </h4> 
+                </div>
+                <div class="card-block">
+                    <div class="table-responsive">
+                        <table class="table mb-0 new-patient-table">
+                            
+                            <tbody>
                                 <tr>
-                                    <td>
-                                        <img width="28" height="28" class="rounded-circle" src="assets/img/user.jpg" alt=""> 
-                                        <h2>Villiam</h2>
-                                    </td>
-                                    <td>Richard123@yahoo.com</td>
-                                    <td>+1-202-555-0106</td>
-                                    <td><button class="btn btn-primary btn-primary-three float-right">Eye</button></td>
+                                    <th>Id</th>
+                                    <th>Category Name</th>
+                                    <th>Product Count</th>
                                 </tr>
+                                {% for category in sorted_category_data|slice:":5" %}
                                 <tr>
-                                    <td>
-                                        <img width="28" height="28" class="rounded-circle" src="assets/img/user.jpg" alt=""> 
-                                        <h2>Martin</h2>
-                                    </td>
-                                    <td>Richard123@yahoo.com</td>
-                                    <td>776-2323 89562015</td>
-                                    <td><button class="btn btn-primary btn-primary-four float-right">Fever</button></td>
+                                    <td ><h2>{{forloop.counter}}</h2></td>                 
+                                    <td><h5 class="time-title p-0">{{ category.category }}</h5></td>
+                                    <td><h5 class="time-title p-0">{{ category.count }}</h5></td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6 col-lg-4 col-xl-4">
+        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title d-inline-block">Top 5 Selling Products </h4> 
+                </div>
+                <div class="card-block">
+                    <div class="table-responsive">
+                        <table class="table mb-0 new-patient-table">
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Poduct Name</th>
+                                    <th>Category</th>
+                                    <th >Price</th>
+                                    <th>Product Count</th>
+                                </tr>
+                                {% for product in sorted_product_data|slice:":5" %}
+                                
+                                <tr> 
+                                    <td ><h2>{{forloop.counter}}</h2></td>                 
+                                    <td><h5 class="time-title p-0">{{ product.name }}</h5> </td>
+                                    <td><h5 class="time-title p-0">{{ product.category }}</h5></td>
+                                    <td >{{ product.price }}</td>
+                                    <td><h5 class="time-title p-0">{{ product.count }}</h5></td>
+                                </tr>
+                                
+                                {% endfor %}
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-12 col-md-6 col-lg-4 col-xl-4">
             <div class="hospital-barchart">
                 <h4 class="card-title d-inline-block">Hospital Management</h4>
             </div>
@@ -321,8 +336,87 @@
                     </div>
                 </div>
             </div>
-         </div>
+         </div> -->
     </div>
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
+            
+        </div>
+        
+        
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card" id="container_content">
+                <div class="card-header">
+                    <h4 class="card-title d-inline-block">Proudct sales report</h4> 
+                </div>
+                <div class="card-block">
+                    <div class="table-responsive">
+                        <table class="table mb-0 new-patient-table">
+                            
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Product Name</th>
+                                    <!-- <th>Product Category</th> -->
+                                    <th>Product price</th>
+                                    <th>Product offer</th>
+                                    <th>Total item sold</th>
+                                </tr>
+                                {% for offer in offers %}
+                                <tr>
+                                    <td ><h2>{{forloop.counter}}</h2></td>                 
+                                    <td><h5 class="time-title p-0">{{ offer.order_items__product__name }}</h5></td>
+                                    <!-- <td><h5 class="time-title p-0"></h5></td> -->
+                                    <td><h5 class="time-title p-0">{{ offer.product_price }}</h5></td>
+                                    <td><h5 class="time-title p-0">{{ offer.total_offer_price }}</h5></td>
+                                    <td><h5 class="time-title p-0">{{ offer.count }}</h5></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary btn_print m-3 h-auto" onclick="exportToPDF()" value="Export to PDF">
+        <i class="fas fa-file-pdf"></i> Download as PDF
+    </button>
+
+    <button type="button" class="btn btn-secondary btn_print m-3 h-auto" onclick="export_data()" value="Export to excel"><i
+          class="fas fa-file-excel"></i> Download as Excel</button>
 </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<script>
+function exportToPDF() {
+    const element = document.getElementById('container_content');
+    const opt = {
+      margin: 10,
+      filename: 'sales_report.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'Landscape' },
+    };
+
+    html2pdf().from(element).set(opt).save();
+  }
+
+
+
+  function export_data() {
+    let data = document.getElementById('container_content');
+    var fp = XLSX.utils.table_to_book(data, { sheet: 'SalesReport' });
+    XLSX.write(fp, {
+      bookType: 'xlsx',
+      type: 'base64'
+    });
+    XLSX.writeFile(fp, 'test.xlsx');
+    }
+</script>
 {% endblock %}
