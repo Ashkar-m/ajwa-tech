@@ -83,10 +83,11 @@ class OrderItem(models.Model):
     offer_price = models.DecimalField(null=True,blank=True,default=0.0,decimal_places=2,max_digits=15)
     coupon_price = models.DecimalField(null=True,blank=True,default=0.0,decimal_places=2,max_digits=15)
     amount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    product_original_price = models.DecimalField(max_digits=20, decimal_places=2, default=0,null=True,blank=True)
     updated_at=models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.product.name
+        return self.order.transaction_id
 
 
 

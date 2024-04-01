@@ -298,7 +298,7 @@
                         <div class="form-group">
                             <div class="custom-control custom-radio">
                                 <input type="radio" class="custom-control-input" name="payment" id="upi" value="2" >
-                                <label class="custom-control-label" for="upi">UPI</label>
+                                <label class="custom-control-label" for="upi">Wallet</label>
                             </div>
                         </div>
                     </div>
@@ -361,77 +361,49 @@
     
 </div>
 
-<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    var options = {
-       
-      // Enter the Key ID generated from the Dashboard
-      key: "{{ razorpay_merchant_key }}", 
-       
-      // Amount is in currency subunits.
-      // Default currency is INR. Hence, 
-      // 50000 refers to 50000 paise
-      amount: "{{ razor_context.razorpay_amount }}", 
-      currency: "{{ currency }}",
-       
-      // Your/store name.
-      name: "AJWA TECH", 
-       
-      // Pass the `id` obtained in the response of Step 1
-      order_id: "{{ razorpay_order_id }}", 
-      callback_url: "{{ callback_url }}",
-    };
-     
-    // initialise razorpay with the options.
-    var rzp1 = new Razorpay(options);
-     
-    // add event listener to the payment button.
-    document.getElementById("razorpay").onclick = function (e) {
-      rzp1.open();
-      e.preventDefault();
-    };
-  </script> -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+var options = {
+    "key": "rzp_test_G53BCAhSqpomES", // Enter the Key ID generated from the Dashboard
+    "amount":'{{ total_price }}' , // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+    "currency": "INR",
+    "name": "AJWA TECH",
+    "description": "Thanks",
+    "image": "http://127.0.0.1:8000/static/assets/img/logo/time.png",
+    "order_id": "{{razorpay_payment.id}}", 
+    "handler": function (response){
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-  var options = {
-      "key": "rzp_test_G53BCAhSqpomES", // Enter the Key ID generated from the Dashboard
-      "amount": 99999999999, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      "currency": "INR",
-      "name": "AJWA TECH",
-      "description": "Thanks",
-      "image": "http://127.0.0.1:8000/static/assets/img/logo/time.png",
-      "order_id": "{{payment.id}}", 
-      "handler": function (response){
-  
-        window.location.href = `http://127.0.0.1:8000/cart/checkout/`;
-  
-         
-      },
-  
-      "theme": {
-          "color": "#3399cc"
-      }
-  };
-  var rzp1 = new Razorpay(options);
-  rzp1.on('payment.failed', function (response){
-    var errorReason = response.error.reason; // Get the specific error reason from the response
-    if (errorReason === 'PAYMENT_ABORTED') {
-        alert('Payment was aborted by the user.');
-    } else if (errorReason === 'CARD_DECLINED') {
-        alert('The card was declined. Please try another card.');
-    } else {
-        alert('An error occurred during payment.');
+      window.location.href = `http://127.0.0.1:8000/index`;
+
+       
+    },
+
+    "theme": {
+        "color": "#3399cc"
     }
-  });
-  document.getElementById('payment').onclick = function(e){
+};
+var rzp1 = new Razorpay(options);
+rzp1.on('payment.failed', function (response){
+  var errorReason = response.error.reason; // Get the specific error reason from the response
+  if (errorReason === 'PAYMENT_ABORTED') {
+      alert('Payment was aborted by the user.');
+  } else if (errorReason === 'CARD_DECLINED') {
+      alert('The card was declined. Please try another card.');
+  } else {
+      alert('An error occurred during payment.');
+  }
+});
+
+document.getElementById('completePayment').onclick = function (e) {
+  var paymentMethod = document.querySelector('input[name="payment"]:checked');
+  if (paymentMethod && paymentMethod.value === '0') {
       rzp1.open();
       e.preventDefault();
-
-      document.getElementById('razorpay').checked = true;
+  } else {
+      // Handle other payment methods here if needed
   }
-  </script>
-
+};
+</script>
   
 
   <script>

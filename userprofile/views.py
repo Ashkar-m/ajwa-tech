@@ -11,6 +11,7 @@ from django.contrib import messages
 
 from django.contrib.auth.models import User
 
+from decimal import Decimal
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
@@ -125,7 +126,6 @@ def addProfile(request):
         # user_address.country=country, 
         # user_address.zip_code=zip_code,
         # user_address.is_primary=is_primary
-        # user_address.save()
 
 
         # except Exception as e:
@@ -292,10 +292,29 @@ def socialAccount(request):
 @login_required(login_url='userlog')
 def orderDetail(request,order_id):
     order = get_object_or_404(Order, id=order_id)
-    for i in order.order_items.all():   
-        print(i.product.name)
+    # for i in order.order_items.all():   
+    #     print(i.product.name)
     context={'order': order}
     return render(request, 'userprofile/orderdetail.html',context=context)
+
+def invoice(request,order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    order_items = order.order_items.all()
+
+    total_price=0
+    for order_item in order_items:
+        # Calculate the total price for each order item
+        total_price += order_item.product_original_price * order_item.quantity
+    if order.total_price>1000:
+        shipping_charge=0
+    else:
+        shipping_charge=2
+    
+
+    total_discount=total_price+shipping_charge-order.total_price
+    context={'order':order,'total_price':total_price,'total_discount':total_discount,'shipping_charge':shipping_charge}
+    return render(request,'userprofile/invoice.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
@@ -372,4 +391,34 @@ def returnOrder(request,pk):
     # # except Exception as e:
     # #     messages.error(request, f"Error: {e}")
 
+@login_required(login_url='/userlog/')
+def payment(request,order_id):
+    order=Order.objects.get(id=order_id)
+    amount=0
+    amount=(order.total_price)*100
+    if request.method == 'POST':
+        payment_type=request.POST.get('payment')
+        print(payment_type)
+        if payment_type is not None:
+            if payment_type == '0':
+                amount=(order.total_price)*100
 
+            elif payment_type == '2':
+                wallet_amount, created =Wallet.objects.get_or_create(user=order.customer)
+                if wallet_amount.balance < order.total_price:
+                    messages.error(request,'You have in suficient wallet amount. please add some money in wallet')
+                    return redirect('wallet')
+                else:
+                    order.payment_method = payment_type
+                    wallet_amount.balance-=Decimal(order.total_price)
+                    wallet_amount.save()
+                    order.payment_status =1
+                    order.complete = True
+                    messages.success(request,'Successfully placed the order.')
+                    order.save()
+
+    context={
+        'amount':amount,
+
+    }
+    return render(request,'userprofile/payment.html',context=context)

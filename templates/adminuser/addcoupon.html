@@ -31,7 +31,7 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Minimun amount</label>
-                                <input class="form-control" type="number" name="coupon_minimum_amount">
+                                <input class="form-control" type="number" name="coupon_minimum_amount" id="coupon_minimum_amount">
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -97,7 +97,24 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const discountInput = document.getElementById('coupon_discount_amount');
+        const minAmountInput = document.getElementById('coupon_minimum_amount');
+        const discountTypeSelect = document.getElementById('coupon_discount_type');
 
+        discountTypeSelect.addEventListener('change', function() {
+            const discountValue = parseFloat(discountInput.value);
+            const minAmountValue = parseFloat(minAmountInput.value);
+            const selectedDiscountType = parseInt(discountTypeSelect.value);
+
+            if (selectedDiscountType === 0 && discountValue > minAmountValue) {
+                alert('Discount amount cannot be greater than the minimum amount.');
+                discountInput.value = minAmountValue; // Reset to minimum value
+            }
+        });
+    });
+</script>
 <script>
     document.getElementById('coupon_discount_type').addEventListener('change', function() {
         var discountType = this.value;

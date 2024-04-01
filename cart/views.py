@@ -97,8 +97,8 @@ def cartView(request):
             if coupon_details.valid_to < timezone.now():
                 messages.error(request,'coupon expired')
             elif coupon_details.minimum_amount < cart_total:
-                if coupon_details.discount_type == 0:
-                    if coupon_details.uses_remaining>0:
+                if coupon_details.discount_type == 0 :
+                    if coupon_details.uses_remaining > 0 :
                         if coupon_details.discount > total_subtotal:
                             messages.error(request,"You can't able to use this coupon!!.Please add more prodcucts.")
                             return redirect('index')
@@ -112,10 +112,14 @@ def cartView(request):
                         cart_item.save()
                         coupon_details.save()
                         messages.success(request,'successfully applied the coupon')
+                    elif coupon_details.active == False:
+                        messages.error(request,'Coupon is bloked by admin!!')
+                    elif coupon_details.uses_remaining == 0 :
+                        messages.error(request,'Coupon code is already used...')
                     else:
                         messages.error(request,"coupon already used.")  
                 else:
-                    if coupon_details.uses_remaining>0:
+                    if coupon_details.uses_remaining > 0 :
                         discount_percentage=((cart_total*coupon_details.discount)/100)
                         cart_total=int(cart_total-((cart_total*coupon_details.discount)/100))
                         coupon_applied=True
@@ -125,6 +129,10 @@ def cartView(request):
                         cart_item.subtotal-=discount_percentage
                         cart_item.save()
                         messages.success(request,'successfully applied the coupon')
+                    elif coupon_details.active == False:
+                        messages.error(request,'Coupon is bloked by admin!!')
+                    elif coupon_details.uses_remaining == 0 :
+                        messages.error(request,'Coupon code is already used...')
                     else:
                         messages.error(request,"coupon already used.")
             else: 
@@ -263,6 +271,9 @@ def checkoutView(request):
     user_order.total_discount=total_discount
     user_order.save()
 
+    total_price=(user_order.total_price)*100
+
+    razorpay_payment=None
     if request.method=='POST':
 
         if request.POST.get('submit_type') == 'select_address':
@@ -285,6 +296,7 @@ def checkoutView(request):
             
             payment=request.POST.get('payment')
             # print(payment)
+            print(payment)
             user_order.payment_method = payment
             
             if not user_order.payment_method:
@@ -297,6 +309,12 @@ def checkoutView(request):
                 if user_order.payment_method == '0' :
                     messages.success(request,'You are redirecting into payment page')
                     return redirect(paymenthandler)
+                    # messages.success(request,'yes')
+                    # razorpay_payment = client.order.create(dict(amount=user_order.total_amount,currency='INR',payment_capture='1'))
+                    # user_order.payment_method = 0
+                    # user_order.payment_status =1
+                    # user_order.complete = True
+                    # user_order.save()
                 elif user_order.payment_method == '2':
                     wallet_amount, created =Wallet.objects.get_or_create(user=user_order.customer)
                     if wallet_amount.balance < user_order.total_price:
@@ -306,13 +324,20 @@ def checkoutView(request):
                         user_order.payment_method = payment
                         wallet_amount.balance-=Decimal(user_order.total_price)
                         wallet_amount.save()
+                        user_order.payment_status =1
                         user_order.complete = True
                         messages.success(request,'Successfully placed the order.')
                         user_order.save()
 
                 # if user_order.payment_method != '0':
-                else:               
+                else:
+                    if user_order.payment_method == '1':
+                        if user_order.total_price > 1000:
+                            messages.warning(request,"You can't able to do buy products greater than 1000 with using COD option")
+                            return redirect(request.path)
+ 
                     user_order.payment_method = payment
+                    user_order.payment_status =1
                     user_order.complete = True
                     messages.success(request,'Successfully placed the order.')
                     user_order.save()
@@ -322,6 +347,7 @@ def checkoutView(request):
                     for cart in cart_items:
                         offer_price= cart.product.price - cart.product.discounted_price
                         coupon_offer= cart.product.discounted_price - Decimal(cart.subtotal)
+                        origianl_price = cart.product.price
                         # print(offer_price)
                         ordered_product, created = OrderItem.objects.get_or_create(
                             quantity=cart.quantity,
@@ -329,9 +355,10 @@ def checkoutView(request):
                             order_id=user_order.id,
                             product_id=cart.product_id,
                             offer_price=offer_price,
-                            coupon_price=coupon_offer
+                            coupon_price=coupon_offer,
+                            product_original_price=origianl_price,
                         )
-                        print(ordered_product.amount,cart.product.price,cart.product.discounted_price)
+                        # print(ordered_product.amount,cart.product.price,cart.product.discounted_price)
 
                         # Update the original stock
                         if not created:
@@ -346,7 +373,6 @@ def checkoutView(request):
 
 
                 return redirect('index')
-        
 
     context={
         'user_order':user_order,
@@ -355,9 +381,9 @@ def checkoutView(request):
         'shipping_charge':shipping_charge,
         'address':address,
         'payment_method':payment_method,
-        # 'filtered_address':filtered_address,
         'categorys':category,
-
+        'total_price':total_price,
+        'razorpay_payment':razorpay_payment,
     }  
     
     return render(request,'cart/checkout.html',context=context)
@@ -452,22 +478,52 @@ def paymenthandler(request):
     if user_order:
         amount=int(user_order.total_price)*100
         payment = client.order.create(dict(amount=amount,currency='INR',payment_capture='1'))
-  
-    user_order.payment_method = 0
-    user_order.complete = True
-    user_order.save()
+    
+    # if request.GET.get('reason') == 'payment_failed':
+    #     # Handle payment failure
+    #     user_order.payment_method = 0
+    #     user_order.payment_status = 0
+    #     user_order.complete = True
+    #     user_order.save()
+    #     messages.error(request,'Payment Failed')
+    #     return redirect('shop')
+    # user_order.payment_method = 0
+    # user_order.payment_status =1
+    # user_order.complete = True
+    # user_order.save()
+    if request.POST.get('razorpay_payment_id'):
+        # Payment succeeded
+        payment_id = request.POST.get('razorpay_payment_id')
+        user_order.payment_method = 0  # Assuming 1 means payment succeeded
+        user_order.payment_status = 1
+        user_order.complete = True
+        user_order.payment_id = payment_id  # Save the payment ID from Razorpay
+        user_order.save()
+        messages.success(request, 'Payment Successful')
+
+    elif request.GET.get('error'):
+        # Payment failed
+        print('error')
+        error_reason = request.GET.get('error')
+        user_order.payment_method = 0  # Assuming 0 means payment failed
+        user_order.payment_status = 0
+        user_order.complete = True
+        user_order.save()
+        messages.error(request, f'Payment Failed: {error_reason}')
     
     if cart_items:
         for cart in cart_items:
             offer_price= cart.product.price - cart.product.discounted_price
             coupon_offer= cart.product.discounted_price - Decimal(cart.subtotal)
+            origianl_price = cart.product.price
             ordered_product, created = OrderItem.objects.get_or_create(
                 quantity=cart.quantity,
                 amount=cart.subtotal,
                 order_id=user_order.id,
                 product_id=cart.product_id,
                 offer_price=offer_price,
-                coupon_price=coupon_offer
+                coupon_price=coupon_offer,
+                product_original_price=origianl_price,
             )
 
             # Update the original stock

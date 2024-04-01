@@ -34,6 +34,7 @@ from django.db.models.functions import TruncDate
 
 from django.utils import timezone
 
+from collections import Counter
 
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -93,10 +94,8 @@ def adminProductmng(request):
             output_field=CharField()
         )
     ).order_by('-latest_timestamp')
-
-
     records_per_page = 10
-    paginator = Paginator( product_data, records_per_page)
+    paginator = Paginator(product_data,records_per_page)
 
     page = request.GET.get('page')
     try:
@@ -120,6 +119,8 @@ def adminCategorymng(request):
 @login_required(login_url='adminlog')
 def adminAddProduct(request):
     category=Category.objects.all()
+    brands=Product.BRAND_CHOICES
+    
     if request.method=='POST':
         product_name = request.POST.get('product_name')
         product_price = request.POST.get('product_price')
@@ -128,6 +129,7 @@ def adminAddProduct(request):
         # product_available = request.POST.get('product_available') == 'on'  # Convert checkbox value to boolean
         product_priority = request.POST.get('product_priority')
         product_description = request.POST.get('product_description')
+        product_brand= request.POST.get('product_brand')
 
         try:
             if product_category:
@@ -146,6 +148,7 @@ def adminAddProduct(request):
                     priority=product_priority,
                     description=product_description,
                 )
+                new_product.brand_name=product_brand
                 new_product.save()
                 messages.success(request,"sucessfully added new product.")
                 return redirect(adminProductmng)
@@ -157,7 +160,7 @@ def adminAddProduct(request):
         except IntegrityError:
             messages.error(request, "Product with this name already exists.")
 
-    context={'categorys':category}
+    context={'categorys':category,'brands':brands}
     return render(request,'adminuser/addproduct.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -173,8 +176,27 @@ def deleteProduct(request,pk):
             messages.error(request,"Product already unlisted.")
     except Exception as e:
         messages.error(request, f"Error deleting product: {e}")
-    product_list=Product.objects.all()
-    context={'products':product_list}
+    
+    product_data = Product.objects.all().annotate(
+    latest_timestamp=Case(
+        When(updated_at__gt=F('created_at'), then=F('updated_at')),
+        default=F('created_at'),
+        output_field=CharField()
+    )
+    ).order_by('-latest_timestamp')
+
+
+    records_per_page = 10
+    paginator = Paginator(product_data,records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+    context={'products':products}
     return render(request,'adminuser/productmanagement.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -190,8 +212,27 @@ def undodeleteProduct(request,pk):
             messages.error(request,"Product already listed.")
     except Exception as e:
         messages.error(request, f"Error deleting product: {e}")
-    product_list=Product.objects.all()
-    context={'products':product_list}
+    # product_list=Product.objects.all()
+    product_data = Product.objects.all().annotate(
+    latest_timestamp=Case(
+        When(updated_at__gt=F('created_at'), then=F('updated_at')),
+        default=F('created_at'),
+        output_field=CharField()
+    )
+    ).order_by('-latest_timestamp')
+
+
+    records_per_page = 10
+    paginator = Paginator(product_data,records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+    context={'products':products}
     return render(request,'adminuser/productmanagement.html',context=context)
 
 
@@ -268,6 +309,7 @@ def editProduct(request,pk):
     product=Product.objects.get(pk=pk)
     category_list=Category.objects.all()
     category_exclude=Category.objects.exclude(name=product.category)
+    brands=Product.BRAND_CHOICES
 
     if request.method == 'POST':
         # Retrieve form data
@@ -278,6 +320,7 @@ def editProduct(request,pk):
         # product_available = request.POST.get('product_available') == 'on'
         product_priority = request.POST.get('product_priority')
         product_description = request.POST.get('product_description')
+        product_brand = request.POST.get('product_brand')
 
         try:
             # Get the category object
@@ -291,6 +334,7 @@ def editProduct(request,pk):
             # product.available = product_available
             product.priority = product_priority
             product.description = product_description
+            product.brand_name= product_brand
 
             # Save the updated product
             product.save()
@@ -305,7 +349,7 @@ def editProduct(request,pk):
             messages.error(request, f"Error deleting categories: {e}")
 
 
-    context={'product':product,'categorys':category_list,'cat':category_exclude}
+    context={'product':product,'categorys':category_list,'cat':category_exclude,'brands':brands,}
     return render(request,'adminuser/editproduct.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -376,9 +420,22 @@ def blockUser(request,pk):
             messages.error(request,"User already blocked..")
     except Exception as e:
         messages.error(request,f"Error:{e}")
+    
+    user_data=UserModel.objects.all().order_by('pk')
+   
+    records_per_page = 10
+    paginator = Paginator(user_data, records_per_page)
 
-    user_data=UserModel.objects.all()
-    context={'users':user_data}
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        users = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        users = paginator.page(paginator.num_pages)
+    context={'users':users}
     return render(request,'adminuser/usermanagement.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -395,8 +452,22 @@ def unblockUser(request,pk):
     except Exception as e:
         messages.error(request,f"Error:{e}")
 
-    user_data=UserModel.objects.all()
-    context={'users':user_data}
+    # user_data=UserModel.objects.all()
+    user_data=UserModel.objects.all().order_by('pk')
+   
+    records_per_page = 10
+    paginator = Paginator(user_data, records_per_page)
+
+    page = request.GET.get('page')
+    try:
+        users = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        users = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        users = paginator.page(paginator.num_pages)
+    context={'users':users}
     return render(request,'adminuser/usermanagement.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
@@ -465,7 +536,6 @@ def editOrder(request,pk):
         try:
             orders.Order_status = order_status
             orders.payment_status = payment_status
-            orders.payment_method = payment_method
             orders.is_cancel = cancel
             
 
@@ -499,11 +569,12 @@ def cancelOrder(request, pk):
             with transaction.atomic():
                  
                 cancel_order.is_cancel = True
+                cancel_order.Order_status = 3
                 cancel_order.save()
-
-                wallet , created =Wallet.objects.get_or_create(user_id=cancel_order.customer_id)
-                wallet.balance+=cancel_order.total_price
-                wallet.save()
+                if (cancel_order.payment_method == 0 and cancel_order.payment_status == 1) or (cancel_order.payment_method == 2 and cancel_order.payment_status == 1):
+                    wallet , created =Wallet.objects.get_or_create(user_id=cancel_order.customer_id)
+                    wallet.balance+=cancel_order.total_price
+                    wallet.save()
 
                 for order_item in cancel_order.order_items.all():
                     product = order_item.product
@@ -550,11 +621,6 @@ def addProductOffer(request):
 def ProductOffers(request):
     items = ProductOffer.objects.all()
 
-    # discounted_prices = [] 
-    # discounted_price=0
-    # for i in items:
-    #     discounted_price = i.product.calculate_discounted_price()
-    #     discounted_prices.append(discounted_price)
 
     context={
         'items':items,
@@ -865,17 +931,6 @@ def retainCoupon(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminIndex(request):
-    # end_date = datetime.now()
-    # # print(end_date)
-    # day=30
-    # start_date_str = request.POST.get('start_date')
-    
-    # sample_date=None
-    # if start_date_str:
-    #     sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-    # if sample_date:
-    #     day=(end_date-sample_date).days
-    # start_date = end_date - timedelta(days=day)
     
     end_date_str = request.POST.get('end_date')  # Assuming 'end_date' is the name of the input field for end date
 
@@ -886,19 +941,48 @@ def adminIndex(request):
             messages.error(request,'An error occured')
     else:
         end_date = datetime.now()
-    print(end_date)
-    day = 30  # Default value for days if start_date is not provided
+    # print(end_date)
 
-    start_date_str = request.POST.get('start_date')
-    if start_date_str:
-        try:
-            sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-            day = (end_date - sample_date).days
-        except ValueError:
-            messages.error(request,'An error occured')
+    # day = 30  # Default value for days if start_date is not provided
 
+    # start_date_str = request.POST.get('start_date')
+    # if start_date_str:
+    #     try:
+    #         sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+    #         day = (end_date - sample_date).days
+    #     except ValueError:
+    #         messages.error(request,'An error occured')
+
+    # start_date = end_date - timedelta(days=day)
+
+    # print(start_date)
+    day=30
+    if request.method == 'POST':
+        start_date_str = request.POST.get('start_date')
+        if start_date_str:
+            try:
+                sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+                day = (end_date - sample_date).days
+            except ValueError:
+                messages.error(request,'An error occured')
     start_date = end_date - timedelta(days=day)
-    print(start_date)
+
+    report_type = 'monthly'
+    if request.method == 'GET':
+        day=30
+        start_date = end_date - timedelta(days=day)
+        report_type = request.GET.get('report_type')
+        if report_type == 'daily' :
+            start_date = end_date - timedelta(days=1)
+        elif report_type == 'weekly':
+            start_date = end_date - timedelta(days=7)
+        elif report_type == 'monthly':
+            start_date = end_date - timedelta(days=30)
+        elif report_type == 'yearly':
+            start_date = end_date - timedelta(days=365)
+        else:
+            # Default to daily if report_type is not specified or invalid
+            start_date = end_date - timedelta(days=30)
 
     prod = Product.objects.all()
     orders_within_range = Order.objects.filter(
@@ -908,12 +992,15 @@ def adminIndex(request):
     order_item = OrderItem.objects.all()
     total_order_items = OrderItem.objects.count()
 
-    order = Order.objects.filter(complete=True).order_by('-date_ordered')[:5]
+    order = Order.objects.filter(complete = True).order_by('-date_ordered')[:5]
 
-    daily_order_data = Order.objects.annotate(date=TruncDate('date_ordered')).values(
+    cancel_order = Order.objects.all().order_by('-date_ordered')
+
+    daily_order_data = orders_within_range.filter(Order_status = '2').annotate(date=TruncDate('date_ordered')).values(
         'date').annotate(order_count=Count('id')).order_by('date')
     labels = [item['date'].strftime('%Y-%m-%d') for item in daily_order_data]
     data = [item['order_count'] for item in daily_order_data]
+
 
     current_year = datetime.now().year
     orders_count = Order.objects.filter(Order_status='2',date_ordered__range=(start_date, end_date)).count()
@@ -933,7 +1020,7 @@ def adminIndex(request):
     overall_discount = orders_within_range.filter(Order_status='2').aggregate(total_discount=Sum('total_discount'))
     
     # top products
-    from collections import Counter
+    
     product_counts = Counter()
     orders=orders_within_range.filter(Order_status='2')
     for ordered_pro in orders:
@@ -992,7 +1079,30 @@ def adminIndex(request):
     # print(f"Total Offer Price (All Products): {total_offer_price_all_products}")
     # print(f"Total Coupon Price (All Products): {total_coupon_price_all_products}")
 
-    
+    # top 5 brand name
+    brand_counts = Counter()
+
+    for ordered_product in orders:
+        ordered_items = OrderItem.objects.filter(order=ordered_product)
+        for item in ordered_items:
+            brand_counts[item.product.brand_name] += 1
+
+    # Convert Counter to a dictionary
+    brand_counts_dict = dict(brand_counts)
+
+    # Sort the dictionary by count in descending order
+    sorted_brand_counts = dict(sorted(brand_counts_dict.items(), key=lambda item: item[1], reverse=True))
+
+    # Prepare the data in the desired format
+    sorted_brand_data = [{'brand_name': brand_name, 'count': count} for brand_name, count in sorted_brand_counts.items()]
+
+    # Now sorted_brand_data contains the total count of each brand name
+    # print(sorted_brand_data)
+    Total_savings=0
+    if total_payment_amount:
+        if total_coupon_price_all_products or total_offer_price_all_products:
+            Total_savings=total_payment_amount-total_coupon_price_all_products-total_offer_price_all_products
+
     context = {
         'orders_count': orders_count,
         'order_item': order_item,
@@ -1014,6 +1124,10 @@ def adminIndex(request):
         'offers':offers,
         'start_date': start_date,
         'end_date': end_date,
-
+        'sorted_brand_data':sorted_brand_data,
+        'cancel_order':cancel_order,
+        'Total_savings':Total_savings,
+        'report_type':report_type,
     }
-    return render(request, 'adminuser/admindemo.html', context)
+    return render(request, 'adminuser/admindemo.html', context=context)
+

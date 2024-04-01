@@ -62,7 +62,22 @@
                                 <input class="" type="checkbox" name="product_available" {% if product.available %}checked{% endif %}>
                             </div>
                         </div> -->
-                        <div class="col-sm-12">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Product Brand</label>
+                            <select class="form-control" name="product_brand">
+                                <option value="{{ product.brand_name }}" selected>{{ product.brand_name }}</option>
+                                {% for choice in brands %}
+                                {% if choice.0 != product.brand_name %}
+                                <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                {% endif %}
+                                {% endfor %}
+                                
+                            </select>
+                        </div>
+                    </div>
+                        
+                        <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Priority</label>
                                 <input class="form-control" type="number" name="product_priority" value="{{ product.priority }}" required>

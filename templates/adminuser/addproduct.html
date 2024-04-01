@@ -61,7 +61,19 @@
                                 <input class="" type="checkbox" name="product_available">
                             </div>
                         </div> -->
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label>Product Brand</label>
+                                <select class="form-control" name="product_brand">
+                                    <option value="" selected disabled>Select Brand</option>
+                                    {% for choice in brands %}
+                                            <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                    {% endfor %}
+                                    <!-- Add more categories as needed -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Priority</label>
                                 <input class="form-control" type="number" name="product_priority">
@@ -120,6 +132,9 @@
                     validDescription:true,
                 },
                 product_category: {
+                    required: true,
+                },
+                product_brand: {
                     required: true,
                 },
             },

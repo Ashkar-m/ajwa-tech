@@ -43,5 +43,6 @@ urlpatterns = [
 
 
     path('adminindex/',views.adminIndex,name='adminindex'),
+    # path('dailyreport/',views.dailyReport,name='dailyreport'),
     
 ]

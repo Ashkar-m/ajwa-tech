@@ -88,7 +88,7 @@ def category(request,slug):
     context = {'categorys': category, 'products': products,'category_list':category_list}
     return render(request,'product/productcategory.html',context)
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def search(request):
     category=Category.objects.all()
     context = {}

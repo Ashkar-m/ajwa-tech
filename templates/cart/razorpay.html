@@ -329,6 +329,7 @@
     } else {
         alert('An error occurred during payment.');
     }
+    window.location.href = `http://127.0.0.1:8000/shop/?reason=${errorReason}`;
   });
   document.getElementById('payment').onclick = function(e){
       rzp1.open();
@@ -371,7 +372,7 @@
             },
             messages: {
                 payment: {
-                    required: "Please select an address",
+                    required: "Please select a payment option",
                 },
             
             },

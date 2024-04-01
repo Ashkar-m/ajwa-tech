@@ -251,7 +251,7 @@
                                             {%endif%}</td>
                                         <td class="align-middle">{% if order.payment_method == 0 %} Razorpay
                                             {% elif order.payment_method == 1 %}Cash on Delivery
-                                            {% elif order.payment_method == 2 %}UPI
+                                            {% elif order.payment_method == 2 %}Wallet
                                             {% else %}Invalid
                                             {%endif%}</td>
                                         <td class="align-middle">{{ order.date_ordered  }}</td>

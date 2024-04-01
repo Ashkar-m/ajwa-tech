@@ -30,21 +30,57 @@
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label>Order Status</label>
-                                <select class="form-control" name="order_order-status">
-                                    <option value="{{ orders.Order_status }}" selected>{% if orders.Order_status == 0 %} Pending{% elif orders.Order_status == 1 %}Shipped{% elif orders.Order_status == 2 %}Delivery{% elif orders.Order_status == 3 %}Cancel{% else %}Invalid{%endif%}</option>
-                                    {% for order in order_statuses %}  
-                                    <option value="{{ order }}">{% if order == 0 %} Pending{% elif order == 1 %}Shipped{% elif order == 2 %}Delivery{% elif order == 3 %}Cancel{% else %}Invalid{%endif%}</option>
+                                <label>Order Status:</label>
+                                <select class="form-control" name="order_order-status" id="orderStatusSelect">
+                                    <option value="{{ orders.Order_status }}" selected>{% if orders.Order_status == 0 %} Pending {% elif orders.Order_status == 1 %} Shipped{% elif orders.Order_status == 2 %}Delivery{% elif orders.Order_status == 3 %}Cancel{% elif orders.Order_status == 4 %}Return{% else %}Invalid{%endif%}</option>
+                                    
+                                    
+                                    {% for order in order_statuses|slice:":1" %}
+                                    {% if orders.Order_status == 0 %}
+                                    <option value="0">Pending</option>
+                                    <option value="1" >Shipped</option>
+                                    <option value="2" >Delivery</option>
+                                    <option value="3" >Cancel</option>
+                                    <option value="4}" >Return</option>
+                                    {% elif orders.Order_status == 1 %}
+                                    <option value="0" disabled>Pending</option>
+                                    <option value="1" >Shipped</option>
+                                    <option value="2" >Delivery</option>
+                                    <option value="3" >Cancel</option>
+                                    <option value="4}" >Return</option>
+                                    {% elif orders.Order_status == 2 %}
+                                    <option value="0" disabled>Pending</option>
+                                    <option value="1" disabled>Shipped</option>
+                                    <option value="2" >Delivery</option>
+                                    <option value="3" >Cancel</option>
+                                    <option value="4" >Return</option>
+                                    {% elif orders.Order_status == 3 %}
+                                    <option value="0" disabled>Pending</option>
+                                    <option value="1" disabled>Shipped</option>
+                                    <option value="2" disabled>Delivery</option>
+                                    <option value="3" >Cancel</option>
+                                    <option value="4" >Return</option>
+                                    {% elif orders.Order_status == 4 %}
+                                    <option value="0" disabled>Pending</option>
+                                    <option value="1" disabled>Shipped</option>
+                                    <option value="2" disabled>Delivery</option>
+                                    <option value="3" disabled>Cancel</option>
+                                    <option value="4" >Return</option>
+                                    {% endif %}
                                     {% endfor %}
+                                    
+                                    
                                 </select>
+                                
                             </div>
                         </div><div class="col-sm-6">
                             <div class="form-group">
                                 <label>Payment Method</label>
-                                <select class="form-control" name="order_payment-method">
-                                    <option value="{{ orders.payment_method }}" selected>{% if orders.payment_method == 0 %} Razorpay{% elif orders.payment_method == 1 %}Cash on Delivery{% elif orders.payment_method == 2 %}UPI{% else %}Invalid{%endif%}</option>
-                                    
-                                </select>
+                                <!-- <select class="form-control" name="order_payment-method"> -->
+                                    <input class="form-control" type="text" value="{% if orders.payment_method == 0 %} Razorpay{% elif orders.payment_method == 1 %}Cash on Delivery{% elif orders.payment_method == 2 %}Wallet{% else %}Invalid{%endif%}">
+                                    <!-- <option value="{{ orders.payment_method }}" selected>{% if orders.payment_method == 0 %} Razorpay{% elif orders.payment_method == 1 %}Cash on Delivery{% elif orders.payment_method == 2 %}Wallet{% else %}Invalid{%endif%}</option>
+                                     -->
+                                <!-- </select> -->
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -97,6 +133,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+
 
 <script>
     $().ready(function () {

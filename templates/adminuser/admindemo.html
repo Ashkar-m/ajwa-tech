@@ -13,6 +13,7 @@
     </center>
     <form method="POST">
         {% csrf_token %}
+        <h4>Custom Date:</h4>
         <label for="start_date">Start Date:</label>
         <input type="date" id="start_date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
         <label for="start_date">End Date:</label>
@@ -21,8 +22,44 @@
         <input type="date" id="End_date" name="end_date" value="{{ start_date|date:'Y-m-d' }}"> -->
         <button type="submit">Apply</button>
     </form>
+    <!-- <form method="GET" >
+        <h4>Selected Report:</h4>
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+    
+        <label for="report_type">Report Type:</label>
+        <select id="report_type" name="report_type">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select><br>
+    
+        <input type="submit" value="Generate Report">
+    </form> -->
+    <form method="GET">
+        <h4>Selected Report:</h4>
+        <!-- <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date|date:'Y-m-d' }}"><br> -->
+    
+        <label>Report Type:</label><br>
+        <input type="radio" id="daily" name="report_type" value="daily" {% if report_type == 'daily' %}checked{% endif %}>
+        <label for="daily">Daily</label>
+    
+        <input type="radio" id="weekly" name="report_type" value="weekly" {% if report_type == 'weekly' %}checked{% endif %}>
+        <label for="weekly">Weekly</label>
+    
+        <input type="radio" id="monthly" name="report_type" value="monthly" {% if report_type == 'monthly' %}checked{% endif %}>
+        <label for="monthly">Monthly</label>
+    
+        <input type="radio" id="yearly" name="report_type" value="yearly" {% if report_type == 'yearly' %}checked{% endif %}>
+        <label for="yearly">Yearly</label>
+    
+        <input type="submit" value="Generate Report">
+    </form>
+    
     <div class="row">
-        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6">
             <div class="dash-widget">
                 <span class="dash-widget-bg1"><i class="fa-brands fa-first-order-alt" aria-hidden="true"></i></span>
                 <div class="dash-widget-info text-right">
@@ -31,16 +68,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6">
             <div class="dash-widget">
                 <span class="dash-widget-bg2"><i class="fa-solid fa-dollar-sign"></i></span>
                 <div class="dash-widget-info text-right">
-                    <h3>Total Earnings</h3>
-                    <span class="widget-title2">${{total_payment_amount}}</span>
+                    <h3>Total Payment</h3>
+                    <span class="widget-title2">${{ total_payment_amount }}</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-4">
             <div class="dash-widget">
                 <span class="dash-widget-bg3"><i class="fa-solid fa-money-bill" aria-hidden="true"></i></span>
                 <div class="dash-widget-info text-right">
@@ -49,7 +86,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-4">
             <div class="dash-widget">
                 <span class="dash-widget-bg4"><i class="fa-solid fa-percentage" aria-hidden="true"></i></span>
                 <div class="dash-widget-info text-right">
@@ -58,36 +95,18 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xl-4">
+            <div class="dash-widget">
+                <span class="dash-widget-bg1"><i class="fa-brands fa-laravel" aria-hidden="true"></i></span>
+                <div class="dash-widget-info text-right">
+                    <h3>Total Savings</h3>
+                    <span class="widget-title1">${{ Total_savings }}</span>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- <div class="row">
-        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="card">
-                <div class="card-body"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
-                    <div class="chart-title">
-                        <h4>Patient Total</h4>
-                        <span class="float-right"><i class="fa fa-caret-up" aria-hidden="true"></i> 15% Higher than Last Month</span>
-                    </div>	
-                    <canvas id="linegraph" width="916" height="458" style="display: block; height: 229px; width: 458px;" class="chartjs-render-monitor"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
-            <div class="card">
-                <div class="card-body"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
-                    <div class="chart-title">
-                        <h4>Patients In</h4>
-                        <div class="float-right">
-                            <ul class="chat-user-total">
-                                <li><i class="fa fa-circle current-users" aria-hidden="true"></i>ICU</li>
-                                <li><i class="fa fa-circle old-users" aria-hidden="true"></i> OPD</li>
-                            </ul>
-                        </div>
-                    </div>	
-                    <canvas id="bargraph" width="916" height="458" style="display: block; height: 229px; width: 458px;" class="chartjs-render-monitor"></canvas>
-                </div>
-            </div>
-        </div>
-    </div> -->
+    
+    <canvas id="dailyOrderChart"></canvas>
     <div class="row">
         <div class="col-12 col-md-6 col-lg-8 col-xl-8">
             <div class="card">
@@ -104,6 +123,7 @@
                                     <th>Address</th>
                                     <th>Date</th>
                                     <th class="text-right">Payment Method</th>
+                                    <!-- <th>Order status</th> -->
                                     <th>Price</th>
                                 </tr>
                                 {% for order in order %}
@@ -123,10 +143,22 @@
                                         {% elif order.payment_method == 1 %}
                                         Cash on delivery
                                         {% elif order.payment_method == 2 %}
-                                        Upi
+                                        Wallet
                                         {% else %}
                                         none
                                         {% endif %}
+                                    </td>
+                                    <!-- <td>{% if order.Order_status == 0 %}
+                                        Pending
+                                        {% elif order.Order_status == 1 %}
+                                        Shipped
+                                        {% elif order.Order_status == 2 %}
+                                        Delivery 
+                                        {% elif order.Order_status == 3 %}
+                                        Cancel
+                                        {% elif order.Order_status == 0 %}
+                                        Return
+                                        {% endif %} -->
                                     </td>
                                     <td><h5 class="time-title p-0">$&nbsp;{{order.total_price}}</h5></td>
                                 </tr>
@@ -138,6 +170,95 @@
                 </div>
             </div>
         </div>
+        
+        <div class="col-12 col-md-6 col-lg-4 col-xl-4">
+            <div class="card member-panel">
+                <div class="card-header bg-white">
+                    <h4 class="card-title mb-0">Payment types</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="contact-list">
+                        <li>
+                            {% for payment_types in payment_types %}
+                            <div class="contact-cont">
+                                <span style="font-size: large;">{% if payment_types.payment_method == 0 %}Razorpay
+                                                                {% elif payment_types.payment_method == 1 %}Cash on delivery
+                                                                {% elif payment_types.payment_method == 2 %}Wallet
+                                                                {% endif %}
+                                </span>: <p class="font-size: x-large; display: inline-block; margin-bottom: 0;" style="font-size: x-large;">{{ payment_types.total_payment }}</p>
+                            </div>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-8 col-xl-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title d-inline-block">Cancelled Orders</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Address</th>
+                                    <th>Date</th>
+                                    <th class="text-right">Payment Method</th>
+                                    <!-- <th>Order status</th> -->
+                                    <th>Price</th>
+                                </tr>
+                                {% for order in cancel_order %}
+                                {% if order.complete and order.is_cancel %}
+                                <tr>
+                                    
+                                    <td >
+                                        <h2>{{ forloop.counter }}</h2>
+                                    </td>                 
+                                    <td><h5 class="time-title p-0">{{order.address.street_address}},{{order.address.city}}</h5>
+                                        <p>{{order.address.country}},{{order.address.state}}</p>
+                                    </td>
+                                    <td><h5 class="time-title p-0">{{order.date_ordered}}</h5></td>
+                                    <td class="text-right">
+                                        {% if order.payment_method == 0 %}
+                                        Razropay
+                                        {% elif order.payment_method == 1 %}
+                                        Cash on delivery
+                                        {% elif order.payment_method == 2 %}
+                                        Upi
+                                        {% else %}
+                                        none
+                                        {% endif %}
+                                    </td>
+                                    <!-- <td>{% if order.Order_status == 0 %}
+                                        Pending
+                                        {% elif order.Order_status == 1 %}
+                                        Shipped
+                                        {% elif order.Order_status == 2 %}
+                                        Delivery 
+                                        {% elif order.Order_status == 3 %}
+                                        Cancel
+                                        {% elif order.Order_status == 0 %}
+                                        Return
+                                        {% endif %} -->
+                                    </td>
+                                    <td><h5 class="time-title p-0">$&nbsp;{{order.total_price}}</h5></td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="col-12 col-md-6 col-lg-4 col-xl-4">
             <div class="card member-panel">
                 <div class="card-header bg-white">
@@ -163,58 +284,10 @@
     </div>
     <div class="row">
         <div class="col-12 col-md-6 col-lg-6 col-xl-6">
-            <!-- <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title d-inline-block">Top 5 Coupons detail </h4> 
-                </div>
-                <div class="card-block">
-                    <div class="table-responsive">
-                        <table class="table mb-0 new-patient-table">
-                            
-                            <tbody>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Coupon code</th>
-                                    <th>Discount type</th>
-                                    <th >Discount</th>
-                                    <th>Total Discount</th>
-                                </tr>
-                                {% for coupon in coupons %}
-                                
-                                <tr>
-                                    
-                                    <td >
-                                        <h2>{{forloop.counter}}</h2>
-                                    </td>                 
-                                    <td><h5 class="time-title p-0">{{ coupon.coupon_code}}</h5>
-                                        
-                                    </td>
-                                    <td><h5 class="time-title p-0">{% if  coupon.discount_type == 0 %}
-                                        Amount
-                                        {% elif coupon.discount_type == 1 %}
-                                        Percentage
-                                        {% endif %}
-                                    </h5></td>
-                                    <td >
-                                        {% if  coupon.discount_type == 0 %}
-                                        $&nbsp;{{ coupon.discount }}
-                                        {% elif coupon.discount_type == 1 %}
-                                        {{ coupon.discount }}&nbsp;%
-                                        {% endif %}
-                                        
-                                    </td>
-                                    <td><h5 class="time-title p-0">{{ coupon.discount_amount }}</h5></td>
-                                </tr>
-                                
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div> -->
+            
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title d-inline-block">Top 5 Product selling Category </h4> 
+                    <h4 class="card-title d-inline-block">Top 10 Product selling Category </h4> 
                 </div>
                 <div class="card-block">
                     <div class="table-responsive">
@@ -226,7 +299,7 @@
                                     <th>Category Name</th>
                                     <th>Product Count</th>
                                 </tr>
-                                {% for category in sorted_category_data|slice:":5" %}
+                                {% for category in sorted_category_data|slice:":10" %}
                                 <tr>
                                     <td ><h2>{{forloop.counter}}</h2></td>                 
                                     <td><h5 class="time-title p-0">{{ category.category }}</h5></td>
@@ -239,10 +312,43 @@
                 </div>
             </div>
         </div>
+
+        
         <div class="col-12 col-md-6 col-lg-6 col-xl-6">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title d-inline-block">Top 5 Selling Products </h4> 
+                    <h4 class="card-title d-inline-block">Top 10 Product Brand </h4> 
+                </div>
+                <div class="card-block">
+                    <div class="table-responsive">
+                        <table class="table mb-0 new-patient-table">
+                            
+                            <tbody>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Brand Name</th>
+                                    <th>Total Product sold</th>
+                                </tr>
+                                {% for brand in sorted_brand_data|slice:":10" %}
+                                <tr>
+                                    <td ><h2>{{forloop.counter}}</h2></td>                 
+                                    <td><h5 class="time-title p-0">{{ brand.brand_name }}</h5></td>
+                                    <td><h5 class="time-title p-0">{{ brand.count }}</h5></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12 col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title d-inline-block">Top 10 Products </h4> 
                 </div>
                 <div class="card-block">
                     <div class="table-responsive">
@@ -255,7 +361,7 @@
                                     <th >Price</th>
                                     <th>Product Count</th>
                                 </tr>
-                                {% for product in sorted_product_data|slice:":5" %}
+                                {% for product in sorted_product_data|slice:":10" %}
                                 
                                 <tr> 
                                     <td ><h2>{{forloop.counter}}</h2></td>                 
@@ -272,75 +378,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- <div class="col-12 col-md-6 col-lg-4 col-xl-4">
-            <div class="hospital-barchart">
-                <h4 class="card-title d-inline-block">Hospital Management</h4>
-            </div>
-            <div class="bar-chart">
-                <div class="legend">
-                    <div class="item">
-                        <h4>Level1</h4>
-                    </div>
-                    
-                    <div class="item">
-                        <h4>Level2</h4>
-                    </div>
-                    <div class="item text-right">
-                        <h4>Level3</h4>
-                    </div>
-                    <div class="item text-right">
-                        <h4>Level4</h4>
-                    </div>
-                </div>
-                <div class="chart clearfix">
-                    <div class="item">
-                        <div class="bar">
-                            <span class="percent">16%</span>
-                            <div class="item-progress" data-percent="16" style="width: 63.6621px;">
-                                <span class="title">OPD Patient</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="bar">
-                            <span class="percent">71%</span>
-                            <div class="item-progress" data-percent="71" style="width: 282.5px;">
-                                <span class="title">New Patient</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="bar">
-                            <span class="percent">82%</span>
-                            <div class="item-progress" data-percent="82" style="width: 326.268px;">
-                                <span class="title">Laboratory Test</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="bar">
-                            <span class="percent">67%</span>
-                            <div class="item-progress" data-percent="67" style="width: 266.585px;">
-                                <span class="title">Treatment</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="bar">
-                            <span class="percent">30%</span>									
-                            <div class="item-progress" data-percent="30" style="width: 119.366px;">
-                                <span class="title">Discharge</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-         </div> -->
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-6 col-lg-6 col-xl-6">
-            
         </div>
         
         
@@ -380,7 +417,12 @@
                 </div>
             </div>
         </div>
+        
     </div>
+
+    
+    
+    
     <button type="button" class="btn btn-secondary btn_print m-3 h-auto" onclick="exportToPDF()" value="Export to PDF">
         <i class="fas fa-file-pdf"></i> Download as PDF
     </button>
@@ -392,6 +434,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    var ctx = document.getElementById('dailyOrderChart').getContext('2d');
+    var labels = eval('(' + '{{ labels|escapejs }}' + ')');
+    var data = eval('(' + '{{ data|escapejs }}' + ')');
+
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Daily Order Count',
+                data: data,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
 <script>
 function exportToPDF() {

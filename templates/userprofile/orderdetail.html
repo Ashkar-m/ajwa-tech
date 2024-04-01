@@ -84,7 +84,7 @@
                     </a>
 					<div class="dropdown-menu">
                         <a class="dropdown-item" href="{% url 'index' %}">Home</a>
-						<a class="dropdown-item" href="{% url 'addprofile' %}">Add Profile</a>
+						<a class="dropdown-item" href="{% url 'userprofile' %}">User Profile</a>
 						
                         <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                         
@@ -105,7 +105,7 @@
         
         <div class="page-wrapper">
             <div class="content">
-                <div class="container">
+                <!-- <div class="container">
                     <div class="row">
                         <div class="col-md-12">
                             <h2>Order Detail</h2>
@@ -141,21 +141,14 @@
                                     {% elif order.payment_method == 1 %}
                                     Cash on Delivery
                                     {% elif order.payment_method == 2 %}
-                                    UPI
+                                    Wallet
                                     {% else %}
                                     Invalid
                                     {% endif %}
                                 </div>
                                 <div class="detail"><strong>Date Ordered:</strong> {{ order.date_ordered }}</div>
                                 <div class="detail"><strong>Total Price:</strong> {{ order.total_price }}</div>
-                                <!-- <div class="detail">
-                                    <strong>Cancel Status:</strong>
-                                    {% if order.is_cancel %}
-                                    Cancelled
-                                    {% else %}
-                                    Not Cancelled
-                                    {% endif %}
-                                </div> -->
+                                
                                 {% if order.Order_status == 2  %}
                                         <td class="align-middle"><a href="">Delivered</a></td>
                                         {% elif order.payment_status == 2 %}
@@ -168,15 +161,10 @@
                                         <td class="align-middle">
                                             <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
                                         </td>
-                                        <!-- <td class="align-middle"><a href="{% url 'cancelorder' pk=order.id %}">cancel</a></td> -->
+                                        
                                         
                                         {% endif %}
-                                <!-- <td class="align-middle">
-                                    <a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a>
-                                </td> -->
-                                <!-- <td class="align-middle">
-                                    <a href="{% url 'returnorder' pk=order.id %}">Return</a>
-                                </td> -->
+                                
                                 <td class="align-middle">
                                     {% if order.Order_status == 2  %}
                                     <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
@@ -186,9 +174,309 @@
                                     <a href="" class="" ><br></a>
                                     {% endif %}
                                 </td>
+                                <br>
+                                <a href="{% url 'invoice' order_id=order.id %}">Invoice</a>
+                    
                                 
                             </div>
                         </div>
+                    </div>
+                </div> -->
+                <div class="row px-xl-5">
+                    <div class="col-lg-12 table-responsive mb-5">
+                        <table class="table table-bordered text-center mb-0">
+                            <!-- <thead class="bg-secondary text-dark">
+                                <tr>
+                                    <th>Product image</th>
+                                    <th>Products</th>
+                                    <th>Quantity</th>
+                                    <th>Transaction Id</th>
+                                    <th>Order Status</th>
+                                    <th>Payment Method</th>
+                                    <th>Date Ordered</th>
+                                    <th>Total Price</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead> -->
+                            <!-- <tbody class="align-middle"> -->
+                                
+                                <!-- <tr>
+                                    <td class="align-middle">{% for order_item in order.order_items.all %}
+                                        {% for Images in order_item.product.images.all %}
+                                        <img src="{{Images.image.url}}" alt="" style="height: 80px;">
+                                        {% endfor %}
+                                        {% endfor %}</td>
+                                    <td class="align-middle">{% for order_item in order.order_items.all %}{{ order_item.product.name }}{% endfor %}</td>
+                                    <td class="align-middle">{% for order_item in order.order_items.all %}{{ order_item.quantity }}{% endfor %}</td>
+                                    <td class="align-middle">
+                                        {{ order.transaction_id }}
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if order.Order_status == 0 %}
+                                        Pending
+                                        {% elif order.Order_status == 1 %}
+                                        Shipped
+                                        {% elif order.Order_status == 2 %}
+                                        Delivered
+                                        {% elif order.Order_status == 3 %}
+                                        Cancelled
+                                        {% elif order.Order_status == 4 %}
+                                        Returned
+                                        {% else %}
+                                        Invalid
+                                        {% endif %}</td>
+                                    <td class="align-middle">{% if order.payment_method == 0 %}
+                                        Razorpay
+                                        {% elif order.payment_method == 1 %}
+                                        Cash on Delivery
+                                        {% elif order.payment_method == 2 %}
+                                        Wallet
+                                        {% else %}
+                                        Invalid
+                                        {% endif %}</td>
+                                        <td class="align-middle">{{ order.date_ordered }}</td>
+                                        <td class="align-middle">{{ order.total_price }}</td>
+
+                                        {% if order.Order_status == 2  %}
+                                        <td class="align-middle"><a href="">Delivered</a></td>
+                                        {% elif order.payment_status == 2 %}
+                                        <td class="align-middle"><a href="">Payment Failed</a></td>
+                                        {% elif order.Order_status == 4 %}
+                                        <td class="align-middle"><a href=""></a></td>
+                                        {% elif order.is_cancel %}
+                                        <td class="align-middle"><a href="">cancelled</a></td>
+                                        {% else %}
+                                        <td class="align-middle">
+                                            <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
+                                        </td>
+                                        
+                                        
+                                        {% endif %}
+
+                                        <td class="align-middle">
+                                            {% if order.Order_status == 2  %}
+                                            <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
+                                            {% elif order.Order_status == 4 %}
+                                            <a href="" class="" >Returned</a>
+                                            {% else %}
+                                            <a href="" class="" ><br></a>
+                                            {% endif %}
+                                        </td>
+                                </tr>   -->
+                                <!-- {% for order_item in order.order_items.all %}
+                                <tr>
+                                    <td class="align-middle">
+                                        {% for Images in order_item.product.images.all %}
+                                            <img src="{{ Images.image.url }}" alt="" style="height: 80px;">
+                                        {% endfor %}
+                                    </td>
+                                    <td class="align-middle">{{ order_item.product.name }}</td>
+                                    <td class="align-middle">{{ order_item.quantity }}</td>
+                                    <td class="align-middle">{{ order.transaction_id }}</td>
+                                    <td class="align-middle">
+                                        {% if order.Order_status == 0 %}
+                                            Pending
+                                        {% elif order.Order_status == 1 %}
+                                            Shipped
+                                        {% elif order.Order_status == 2 %}
+                                            Delivered
+                                        {% elif order.Order_status == 3 %}
+                                            Cancelled
+                                        {% elif order.Order_status == 4 %}
+                                            Returned
+                                        {% else %}
+                                            Invalid
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if order.payment_method == 0 %}
+                                            Razorpay
+                                        {% elif order.payment_method == 1 %}
+                                            Cash on Delivery
+                                        {% elif order.payment_method == 2 %}
+                                            Wallet
+                                        {% else %}
+                                            Invalid
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">{{ order.date_ordered }}</td>
+                                    <td class="align-middle">{{ order.total_price }}</td>
+                                    <td class="align-middle">
+                                        {% if order.Order_status == 2 %}
+                                            <a href="">Delivered</a>
+                                        {% elif order.payment_status == 2 %}
+                                            <a href="">Payment Failed</a>
+                                        {% elif order.Order_status == 4 %}
+                                            
+                                        {% elif order.is_cancel %}
+                                            <a href="">Cancelled</a>
+                                        {% else %}
+                                            <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
+                                        {% endif %}
+                                    </td>
+                                    <td class="align-middle">
+                                        {% if order.Order_status == 2 %}
+                                            <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
+                                        {% elif order.Order_status == 4 %}
+                                            <a href="" class="">Returned</a>
+                                        {% else %}
+                                            <a href="" class=""><br></a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %} -->
+
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product Image</th>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <!-- <th colspan="6">Order Details (Common for All Products)</th>
+                                        <th colspan="2">Actions</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order_item in order.order_items.all %}
+                                        <tr>
+                                            <!-- Product Image -->
+                                            <td class="align-middle">
+                                                {% for Images in order_item.product.images.all %}
+                                                    <img src="{{ Images.image.url }}" alt="" style="height: 80px;">
+                                                {% endfor %}
+                                            </td>
+                                            <!-- Product Name -->
+                                            <td class="align-middle">{{ order_item.product.name }}</td>
+                                            <!-- Product Quantity -->
+                                            <td class="align-middle">{{ order_item.quantity }}</td>
+                                            <!-- Common Order Details (spanned across multiple columns) -->
+                                        </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <!-- <td colspan="6" class="align-middle">
+                                                {{ order.transaction_id }}<br>
+                                                {% if order.Order_status == 0 %}
+                                                    Pending
+                                                {% elif order.Order_status == 1 %}
+                                                    Shipped
+                                                {% elif order.Order_status == 2 %}
+                                                    Delivered
+                                                {% elif order.Order_status == 3 %}
+                                                    Cancelled
+                                                {% elif order.Order_status == 4 %}
+                                                    Returned
+                                                {% else %}
+                                                    Invalid
+                                                {% endif %}<br>
+                                                {% if order.payment_method == 0 %}
+                                                    Razorpay
+                                                {% elif order.payment_method == 1 %}
+                                                    Cash on Delivery
+                                                {% elif order.payment_method == 2 %}
+                                                    Wallet
+                                                {% else %}
+                                                    Invalid
+                                                {% endif %}<br>
+                                                {{ order.date_ordered }}<br>
+                                                {{ order.total_price }}
+                                            </td>
+                                            
+                                            <td colspan="2" class="align-middle">
+                                                {% if order.Order_status == 2 %}
+                                                    <a href="">Delivered</a>
+                                                {% elif order.payment_status == 2 %}
+                                                    <a href="">Payment Failed</a>
+                                                {% elif order.Order_status == 4 %}
+                                                    
+                                                {% elif order.is_cancel %}
+                                                    <a href="">Cancelled</a>
+                                                {% else %}
+                                                    <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
+                                                {% endif %}
+                                                {% if order.Order_status == 2 %}
+                                                    <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
+                                                {% elif order.Order_status == 4 %}
+                                                    <a href="" class="">Returned</a>
+                                                {% else %}
+                                                    <a href="" class=""><br></a>
+                                                {% endif %}
+                                            </td> -->
+                                            <td class="align-middle">
+                                                <strong>Transaction Id:&nbsp;&nbsp;</strong>{{ order.transaction_id }}
+                                            </td>
+                                            <td class="align-middle">
+                                                {% if order.Order_status == 0 %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Pending
+                                                {% elif order.Order_status == 1 %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Shipped
+                                                {% elif order.Order_status == 2 %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Delivered
+                                                {% elif order.Order_status == 3 %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Cancelled
+                                                {% elif order.Order_status == 4 %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Returned
+                                                {% else %}
+                                                <strong>Delivery Status:&nbsp;&nbsp;</strong>Invalid
+                                                {% endif %}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="align-middle">{% if order.payment_method == 0 %}
+                                                <strong>Payment Type:&nbsp;&nbsp;</strong>Razorpay
+                                                {% elif order.payment_method == 1 %}
+                                                <strong>Payment Type:&nbsp;&nbsp;</strong>Cash on Delivery
+                                                {% elif order.payment_method == 2 %}
+                                                <strong>Payment Type:&nbsp;&nbsp;</strong>Wallet
+                                                {% else %}
+                                                <strong>Payment Type:&nbsp;&nbsp;</strong>Invalid
+                                                {% endif %}</td>
+                                                <td class="align-middle"><strong>Date Ordered:&nbsp;&nbsp;</strong>{{ order.date_ordered }}</td>
+                                                <td class="align-middle"><strong>Total Price:&nbsp;&nbsp;</strong>{{ order.total_price }}</td>
+                                            </tr>
+                                                {% if order.Order_status == 2  %}
+                                                <td class="align-middle"><a href="">Delivered</a></td>
+                                                {% elif order.payment_status == 2 %}
+                                                <td class="align-middle"><a href="">Payment Failed</a></td>
+                                                {% elif order.Order_status == 4 %}
+                                                <td class="align-middle"><a href=""></a></td>
+                                                {% elif order.is_cancel %}
+                                                <td class="align-middle"><a href="">cancelled</a></td>
+                                                {% else %}
+                                                <td class="align-middle">
+                                                    <button><a href="#" class="cancel-order" data-order-id="{{ order.id }}">Cancel</a></button>
+                                                </td>
+                                                
+                                                
+                                                {% endif %}
+                                            
+        
+                                                <td class="align-middle">
+                                                    {% if order.Order_status == 2  %}
+                                                    <button><a href="{% url 'returnorder' pk=order.id %}" class="return-order" data-order-id="{{ order.id }}">Return</a></button>
+                                                    {% elif order.Order_status == 4 %}
+                                                    <a href="" class="" >Returned</a>
+                                                    {% else %}
+                                                    <a href="" class="" ><br></a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if order.Order_status == 2 %}
+                                                    <a href="{% url 'invoice' order_id=order.id %}">Invoice</a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if order.payment_status == 0 %}
+                                                    <a href="{% url 'payment' order_id=order.id %}">Continue Your Payment</a>
+                                                    {% endif %}
+                                                </td>
+                                        </tr>
+                                    
+                                </tbody>
+                            </table>
+                            
+                            
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

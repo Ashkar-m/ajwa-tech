@@ -46,11 +46,12 @@
                                     {% elif order.Order_status == 1 %}Shipped
                                     {% elif order.Order_status == 2 %}Delivery
                                     {% elif order.Order_status == 3 %}Cancel
+                                    {% elif order.Order_status == 4 %}Return
                                     {% else %}Invalid
                                     {%endif%}</td>
                                 <td>{% if order.payment_method == 0 %} Razorpay
                                     {% elif order.payment_method == 1 %}Cash on Delivery
-                                    {% elif order.payment_method == 2 %}UPI
+                                    {% elif order.payment_method == 2 %}Wallet
                                     {% else %}Invalid
                                     {%endif%}</td>
                                 <td>{% if order.payment_status == 0 %} Pending
