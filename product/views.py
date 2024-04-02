@@ -82,8 +82,35 @@ def detail(request,slug):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category(request,slug):
     category = Category.objects.get(slug=slug)
-    products = category.product_set.all()
+    products = Product.objects.filter(category=category)
+    # products = category.product_set.all()
     category_list=Category.objects.all()
+    
+    sort_option = request.GET.get('sort', 'name_asc')
+
+    # Handle sorting options
+    if sort_option == 'price_low':
+        products = products.order_by('price')
+    elif sort_option == 'price_high':
+        products = products.order_by('-price')
+    elif sort_option == 'new_arrivals':
+        products = products.order_by('-created_at')
+    elif sort_option == 'name_asc':
+        products = products.order_by('name')
+    elif sort_option == 'name_desc':
+        products = products.order_by('-name')
+    # try:
+    #     products = Product.objects.filter(category=category)
+    #     query = request.GET.get('cat')
+    #     sort_option = request.GET.get('sort', '-created_at')
+    #     if query:
+    #         # Filter products by search query
+    #         products = products.filter(title__icontains=query)
+
+    #     # Apply sorting to the product queryset
+    #     print(products)
+    # except Exception as e:
+    #     messages.error(request,f'Error :{e}')
 
     context = {'categorys': category, 'products': products,'category_list':category_list}
     return render(request,'product/productcategory.html',context)
@@ -113,7 +140,7 @@ def search(request):
             products = products.order_by('name')
         elif sort_option == 'name_desc':
             products = products.order_by('-name')
-        items_per_page = 10
+        items_per_page = 12
         paginator = Paginator(products, items_per_page)
         page = request.GET.get('page')
 

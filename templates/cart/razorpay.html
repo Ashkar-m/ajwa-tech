@@ -309,8 +309,9 @@
       "image": "http://127.0.0.1:8000/static/assets/img/logo/time.png",
       "order_id": "{{payment.id}}", 
       "handler": function (response){
-  
-        window.location.href = `http://127.0.0.1:8000/index`;
+        
+        
+        window.location.href = `http://127.0.0.1:8000/cart/paymentsuccess`;
   
          
       },
@@ -329,7 +330,7 @@
     } else {
         alert('An error occurred during payment.');
     }
-    window.location.href = `http://127.0.0.1:8000/shop/?reason=${errorReason}`;
+    window.location.href = `http://127.0.0.1:8000/cart/paymentfailure`;
   });
   document.getElementById('payment').onclick = function(e){
       rzp1.open();

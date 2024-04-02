@@ -17,5 +17,8 @@ urlpatterns = [
     path('paymenthandler/',views.paymenthandler,name='paymenthandler'),
 
     path('removecoupon/<pk>',views.removeCoupon,name='removecoupon'),
+    path('paymentsuccess/',views.paymentSuccess,name='paymentsuccess'),
+    path('paymentfailure/',views.paymentFailure,name='paymentfailure'),
+    path('walletpayment/<int:amount>',views.walletPayment,name='walletpayment'),
     
 ]

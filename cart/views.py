@@ -30,7 +30,10 @@ from decimal import Decimal
 from django.http import JsonResponse
 
 from django.http import HttpResponse
+
 import json
+
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -309,12 +312,7 @@ def checkoutView(request):
                 if user_order.payment_method == '0' :
                     messages.success(request,'You are redirecting into payment page')
                     return redirect(paymenthandler)
-                    # messages.success(request,'yes')
-                    # razorpay_payment = client.order.create(dict(amount=user_order.total_amount,currency='INR',payment_capture='1'))
-                    # user_order.payment_method = 0
-                    # user_order.payment_status =1
-                    # user_order.complete = True
-                    # user_order.save()
+
                 elif user_order.payment_method == '2':
                     wallet_amount, created =Wallet.objects.get_or_create(user=user_order.customer)
                     if wallet_amount.balance < user_order.total_price:
@@ -460,16 +458,21 @@ def removeWishlist(request,product_id):
 def wallet(request):
     wallet,created=Wallet.objects.get_or_create(user_id=request.user.usermodel.id)
     category=Category.objects.all()
-    context={'wallet':wallet,'categorys':category}
-
+    money=100
     if request.method=='POST':
         money=int(request.POST.get('money'))
-        wallet.balance+=int(money)
-        wallet.save()
+        messages.warning(request,'please complete paymet by clicking complete payment button.')
+    # print(money)
+        # wallet.balance+=int(money)
+        # wallet.save()
+    display_money=money/100
+    payment = client.order.create(dict(amount=(money)*100,currency='INR',payment_capture='1'))
+    context={'wallet':wallet,'categorys':category,'money':money,'payment':payment,'display_money':display_money,}
     return render(request,'cart/wallet.html',context=context)
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @csrf_exempt
+# @require_POST
 @login_required(login_url='/userlog/')
 def paymenthandler(request):
     user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
@@ -479,37 +482,6 @@ def paymenthandler(request):
         amount=int(user_order.total_price)*100
         payment = client.order.create(dict(amount=amount,currency='INR',payment_capture='1'))
     
-    # if request.GET.get('reason') == 'payment_failed':
-    #     # Handle payment failure
-    #     user_order.payment_method = 0
-    #     user_order.payment_status = 0
-    #     user_order.complete = True
-    #     user_order.save()
-    #     messages.error(request,'Payment Failed')
-    #     return redirect('shop')
-    # user_order.payment_method = 0
-    # user_order.payment_status =1
-    # user_order.complete = True
-    # user_order.save()
-    if request.POST.get('razorpay_payment_id'):
-        # Payment succeeded
-        payment_id = request.POST.get('razorpay_payment_id')
-        user_order.payment_method = 0  # Assuming 1 means payment succeeded
-        user_order.payment_status = 1
-        user_order.complete = True
-        user_order.payment_id = payment_id  # Save the payment ID from Razorpay
-        user_order.save()
-        messages.success(request, 'Payment Successful')
-
-    elif request.GET.get('error'):
-        # Payment failed
-        print('error')
-        error_reason = request.GET.get('error')
-        user_order.payment_method = 0  # Assuming 0 means payment failed
-        user_order.payment_status = 0
-        user_order.complete = True
-        user_order.save()
-        messages.error(request, f'Payment Failed: {error_reason}')
     
     if cart_items:
         for cart in cart_items:
@@ -576,3 +548,36 @@ def removeCoupon(request,pk):
     return render(request,'cart/cart.html')
 
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='/userlog/')
+def paymentSuccess(request):
+    user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
+    user_order.payment_method = 0
+    user_order.payment_status =1
+    user_order.complete = True
+    user_order.save()
+    messages.success(request,'Order places Succefully..')
+    return redirect('index')
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='/userlog/')
+def paymentFailure(request):
+    user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
+    user_order.payment_method = 0
+    user_order.payment_status =0
+    user_order.complete = True
+    user_order.save()
+    messages.error(request,"Payment Failed.Order Doesn't placed..")
+    return redirect('index')
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='/userlog/')
+def walletPayment(request,amount):
+    wallet,created=Wallet.objects.get_or_create(user_id=request.user.usermodel.id)
+    # money=int(request.POST.get('money'))
+    # money = request.GET.get('money')
+    money= int(amount)
+    wallet.balance+=int(money)
+    wallet.save()
+    messages.success(request,'successfully added money into wallet.')
+    return redirect('wallet')

@@ -13,6 +13,14 @@ from django.contrib.auth.models import User
 
 from decimal import Decimal
 
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+import razorpay
+
+from django.conf import settings
+
+from django.http import JsonResponse
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def userProfile(request):
@@ -25,6 +33,14 @@ def userProfile(request):
 
         ordered_items=Order.objects.filter(customer_id=profile.user_id).exclude(complete=False).order_by('-date_ordered')
         
+        page = request.GET.get('page', 1)
+        paginator = Paginator(ordered_items, 10)  # Show 10 items per page
+        try:
+            ordered_items = paginator.page(page)
+        except PageNotAnInteger:
+            ordered_items = paginator.page(1)
+        except EmptyPage:
+            ordered_items = paginator.page(paginator.num_pages)
         
           
     except  UserModel.DoesNotExist:
@@ -297,6 +313,8 @@ def orderDetail(request,order_id):
     context={'order': order}
     return render(request, 'userprofile/orderdetail.html',context=context)
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='userlog')
 def invoice(request,order_id):
     order = get_object_or_404(Order, id=order_id)
 
@@ -348,6 +366,7 @@ def changePassword(request):
             
     return render(request,'userprofile/changepassword.html')
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def returnOrder(request,pk):
     try:
@@ -391,17 +410,30 @@ def returnOrder(request,pk):
     # # except Exception as e:
     # #     messages.error(request, f"Error: {e}")
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def payment(request,order_id):
     order=Order.objects.get(id=order_id)
     amount=0
     amount=(order.total_price)*100
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    payment = client.order.create(dict(amount=int(amount),currency='INR',payment_capture='1'))
     if request.method == 'POST':
         payment_type=request.POST.get('payment')
-        print(payment_type)
         if payment_type is not None:
-            if payment_type == '0':
-                amount=(order.total_price)*100
+            if payment_type == '1':
+                print('hi')
+                if order.total_price > 1000:
+                    messages.warning(request,"You can't able to do buy products greater than 1000 with using COD option")
+                    return redirect(request.path)
+
+                order.payment_method = 1
+                order.payment_status = 1
+                order.complete = True
+                messages.success(request,'Successfully placed the order.')
+                order.save()
+                return redirect(userProfile)
+                
 
             elif payment_type == '2':
                 wallet_amount, created =Wallet.objects.get_or_create(user=order.customer)
@@ -409,16 +441,30 @@ def payment(request,order_id):
                     messages.error(request,'You have in suficient wallet amount. please add some money in wallet')
                     return redirect('wallet')
                 else:
-                    order.payment_method = payment_type
+                    order.payment_method = 2
                     wallet_amount.balance-=Decimal(order.total_price)
                     wallet_amount.save()
-                    order.payment_status =1
+                    order.payment_status = 1
                     order.complete = True
                     messages.success(request,'Successfully placed the order.')
                     order.save()
+                    return redirect(userProfile)
 
     context={
         'amount':amount,
+        'order':order,
+        'payment':payment,
 
     }
     return render(request,'userprofile/payment.html',context=context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(login_url='/userlog/')
+def failedRazorpay(request,order_id):
+    order=Order.objects.get(id=order_id)
+    order.payment_method = 0
+    order.payment_status = 1
+    order.complete = True
+    messages.success(request,'Successfully placed the order.')
+    order.save()
+    return redirect(userProfile)

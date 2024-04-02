@@ -103,6 +103,11 @@
             </div>
         </div>
         <div class="page-wrapper">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
             <div class="content">
                 <div class="row">
                     <div class="col-sm-10 col-9">
@@ -296,6 +301,43 @@
 						</div>
 						
 					</div>
+
+                    <div class="pagination mt-3 col-12 pb-1">
+                        <span class="step-links">
+                            <span class="current">
+                                Page {{ ordered_items.number }} of {{ ordered_items.paginator.num_pages }}.
+                            </span>
+                            {% if ordered_items.has_previous %}
+                                <ul class="pagination justify-content-center mb-3">
+                                    {% if ordered_items.number == 1 %}
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.next_page_number }}">next</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.paginator.num_pages }}">last &raquo;</a></li>
+                                    {% elif ordered_items.number == ordered_items.paginator.num_pages %}
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page=1">&laquo; first</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.previous_page_number }}">previous</a></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.previous_page_number }}">previous</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.next_page_number }}">next</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.paginator.num_pages }}">last &raquo;</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                            
+                            {% if ordered_items.has_next %}
+                                <ul class="pagination justify-content-center mb-3">
+                                    {% if ordered_items.number == ordered_items.paginator.num_pages %}
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page=1">&laquo; first</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.previous_page_number }}">previous</a></li>
+                                    {% elif not ordered_items.has_previous %}
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.next_page_number }}">next</a></li>
+                                        <li class="page-item"><a class="page-link" href="?sort={{ sort_option }}&page={{ ordered_items.paginator.num_pages }}">last &raquo;</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                        </span>
+                        
+                    </div>
+
 				</div>
             </div>
             <div class="notification-box">
@@ -330,6 +372,20 @@
                 if (confirm("Are you sure you want to Return this order?")) {
                     window.location.href = "{% url 'returnorder' pk=0 %}".replace('0', orderId);
                 }
+            });
+        });
+    </script>
+    <script>
+        // Wait for the DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all elements with the class 'messages' (adjust as needed)
+            var messageElements = document.querySelectorAll('.success-message,.error-message,.warning-message');
+    
+            // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+            messageElements.forEach(function(messageElement) {
+                setTimeout(function() {
+                    messageElement.style.display = 'none';
+                }, 5000);  // Adjust the time as needed (in milliseconds)
             });
         });
     </script>

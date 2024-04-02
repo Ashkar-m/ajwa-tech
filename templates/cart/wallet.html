@@ -154,15 +154,16 @@
                 <h3 class="card-title">Wallet Money</h3>
                 <div class="col-lg-12 table-responsive mb-5">
 
-                <form method="post">
+                <form method="post" id="paymentForm">
                     {% csrf_token %}
                     <div class="input-group">
                         <input type="text" class="form-control" name="wallet_money" value="{{ wallet.balance }}">
                         
                     </div>
                     <h5 class="mt-4">Add money</h5>
-                    <input type="number" class="form-control mt-4" name="money" placeholder="Enter money you want to add">
-                    <center><button type="submit" class="search-button mt-4" style="align-content: center;">Add money</button></center>
+                    <input type="number" class="form-control mt-4" min="1" name="money" placeholder="Enter money you want to add" value="{{ money }}" >
+                    <center><button type="submit" class="search-button mt-4" style="align-content: center;"  >Initiate payment</button></center>
+                    <center><button type="button"class="search-button mt-4" style="align-content: center;" id="payment">Complete Payment</button></center>
                 </form>
                     
                 </div>
@@ -219,7 +220,49 @@
     </div>
     
 </div>
-<!-- Footer End -->
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+  var options = {
+      "key": "rzp_test_G53BCAhSqpomES", // Enter the Key ID generated from the Dashboard
+      "amount":'{{money}}' , // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      "currency": "INR",
+      "name": "AJWA TECH",
+      "description": "Thanks",
+      "image": "http://127.0.0.1:8000/static/static/img/product/ajwa logo.jpeg",
+      "order_id": "{{payment.id}}", 
+      "handler": function (response){
+  
+        var payment= '{{ money }}';
+        window.location.href = `http://127.0.0.1:8000/cart/walletpayment/${payment}`;
+  
+         
+      },
+  
+      "theme": {
+          "color": "#3399cc"
+      }
+  };
+  var rzp1 = new Razorpay(options);
+  rzp1.on('payment.failed', function (response){
+    var errorReason = response.error.reason; // Get the specific error reason from the response
+    if (errorReason === 'PAYMENT_ABORTED') {
+        alert('Payment was aborted by the user.');
+    } else if (errorReason === 'CARD_DECLINED') {
+        alert('The card was declined. Please try another card.');
+    } else {
+        alert('An error occurred during payment.');
+    }
+    window.location.href = `http://127.0.0.1:8000/cart/`;
+  });
+  document.getElementById('payment').onclick = function(e){
+    rzp1.open();
+    e.preventDefault();
+}
+  
+  </script>
+
+
 
 <!-- Back to Top -->
 <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
@@ -244,7 +287,7 @@
     // Wait for the DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
         // Select all elements with the class 'messages' (adjust as needed)
-        var messageElements = document.querySelectorAll('.success-message,.error-message');
+        var messageElements = document.querySelectorAll('.success-message,.error-message,.warning-message');
 
         // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
         messageElements.forEach(function(messageElement) {

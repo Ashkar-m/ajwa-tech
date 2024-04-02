@@ -111,8 +111,14 @@
             </div>
             <div class="form-group">
                 <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" name="payment" id="cod" value="1" >
+                    <label class="custom-control-label selected" for="cod">Cash on Delivery</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="custom-control custom-radio">
                     <input type="radio" class="custom-control-input" name="payment" id="wallet" value="2" >
-                    <label class="custom-control-label" for="upi">Wallet</label>
+                    <label class="custom-control-label" for="wallet">Wallet</label>
                 </div>
             </div>
         </div>
@@ -135,8 +141,12 @@
       "image": "http://127.0.0.1:8000/static/assets/img/logo/time.png",
       "order_id": "{{payment.id}}", 
       "handler": function (response){
+
+        var orderId = '{{ order.id }}'; // Assuming payment.id contains the order ID
+        var redirectUrl = `http://127.0.0.1:8000/userProfile/razorpaycomplete/${orderId}`;
+        window.location.href = redirectUrl;
   
-        window.location.href = `http://127.0.0.1:8000/index`;
+        
   
          
       },
@@ -167,51 +177,8 @@
     }
 };
   </script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var completePaymentBtn = document.getElementById('completePayment');
-        var paymentTypeInput = document.getElementById('paymentTypeInput'); // Assuming you have an input field with this ID
-    
-        completePaymentBtn.addEventListener('click', function(event) {
-            var razorpayRadio = document.getElementById('razorpay');
-    
-            if (razorpayRadio.checked) {
-                paymentTypeInput.value = '0'; // Set the value to '0' for Razorpay
-            } else {
-                paymentTypeInput.value = '1'; // Set the value to '1' for Wallet or other options
-            }
-    
-            // Debug: Output the value of paymentTypeInput to console
-            console.log("Payment Type Input Value:", paymentTypeInput.value);
-    
-            // Continue with form submission
-            document.getElementById('paymentform').submit();
-        });
-    });
-    
-    
-  </script>
-
-  <!-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var razorpayRadio = document.getElementById('razorpay');
-        var walletRadio = document.getElementById('wallet');
-        var completePaymentBtn = document.getElementById('completePayment');
-        var paymentTypeInput = document.querySelector('input[name="payment"]');
-    
-        completePaymentBtn.addEventListener('click', function(event) {
-            if (razorpayRadio.checked) {
-                paymentTypeInput.value = '0'; // Set the value to '0' for Razorpay
-            } else if (walletRadio.checked) {
-                paymentTypeInput.value = '2'; // Set the value to '1' for Wallet
-            } else {
-                // Handle other payment methods if needed
-            }
-            // Continue with form submission
-        });
-    });
-    
-  </script> -->
+  
+  
 <script>
     // Wait for the DOM to be ready
     document.addEventListener('DOMContentLoaded', function() {
