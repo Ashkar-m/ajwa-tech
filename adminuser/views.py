@@ -64,12 +64,18 @@ def adminLogin(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminHome(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     
     return render(request,'adminuser/index.html')
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminUsermng(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     user_data=UserModel.objects.all().order_by('pk')
    
     records_per_page = 10
@@ -91,7 +97,10 @@ def adminUsermng(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminProductmng(request):
-    
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
+
     def sort_by_last_activity(products):
         return sorted(products, key=lambda x: x.latest_timestamp, reverse=True)
 
@@ -134,6 +143,9 @@ def adminProductmng(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminCategorymng(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     category_data=Category.objects.all()
     context={'categorys':category_data}
     return render(request,'adminuser/categorymanagement.html',context=context)
@@ -141,6 +153,9 @@ def adminCategorymng(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminAddProduct(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     category=Category.objects.all()
     brands=Product.BRAND_CHOICES
     
@@ -189,6 +204,9 @@ def adminAddProduct(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def deleteProduct(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     product=Product.objects.get(pk=pk)
     try:
         if product.delete_status==Product.LIVE:
@@ -225,6 +243,9 @@ def deleteProduct(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def undodeleteProduct(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     product=Product.objects.get(pk=pk)
     try:
         if product.delete_status==Product.DELETE:
@@ -262,6 +283,9 @@ def undodeleteProduct(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminAddcategory(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     if request.method=='POST':
         try:
             category_name=request.POST.get('category_name')
@@ -286,6 +310,9 @@ def adminAddcategory(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def deleteCategory(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     category=Category.objects.get(pk=pk)
     try:
         if category.delete_status==Category.LIVE:
@@ -307,6 +334,9 @@ def deleteCategory(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def undodeleteCategory(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     category=Category.objects.get(pk=pk)
     try:
         if category.delete_status==Category.DELETE:
@@ -329,6 +359,9 @@ def undodeleteCategory(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editProduct(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     product=Product.objects.get(pk=pk)
     category_list=Category.objects.all()
     category_exclude=Category.objects.exclude(name=product.category)
@@ -378,6 +411,9 @@ def editProduct(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editCategory(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     category=Category.objects.get(pk=pk)
 
     if request.method=='POST':
@@ -400,6 +436,9 @@ def editCategory(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def addProductImage(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     product_user=Product.objects.get(pk=pk)
 
     if request.method == 'POST':
@@ -421,6 +460,9 @@ def addProductImage(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def deleteProductImage(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     product_image=ProductImage.objects.get(pk=pk)
     try:
         product_image.delete()
@@ -433,6 +475,9 @@ def deleteProductImage(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def blockUser(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     block_user=UserModel.objects.get(pk=pk)
     try:
         if block_user.is_blocked==False:
@@ -464,6 +509,9 @@ def blockUser(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def unblockUser(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     block_user=UserModel.objects.get(pk=pk)
     try:
         if block_user.is_blocked==True:
@@ -496,6 +544,9 @@ def unblockUser(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminlogout(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     logout(request)
     messages.success(request,"Admin Logout successfully.")
     return redirect(adminLogin)
@@ -504,6 +555,9 @@ def adminlogout(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminOrdermng(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     # orders=Order.objects.filter(complete=True)
     orders=None
     order_data=Order.objects.filter(complete=True).annotate(
@@ -532,6 +586,9 @@ def adminOrdermng(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editOrder(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     orders=Order.objects.get(pk=pk)
     
     selected_status = orders.Order_status
@@ -583,6 +640,9 @@ def editOrder(request,pk):
 @login_required(login_url='/userlog/')
 @transaction.atomic
 def cancelOrder(request, pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     try:
         cancel_order = Order.objects.prefetch_related('order_items__product').get(pk=pk)
         
@@ -617,6 +677,9 @@ def cancelOrder(request, pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def addProductOffer(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     products = Product.objects.filter(available=True,stock__gte=0)
     
     if request.method == "POST":
@@ -640,6 +703,9 @@ def addProductOffer(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def ProductOffers(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items = ProductOffer.objects.all()
 
 
@@ -651,6 +717,9 @@ def ProductOffers(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editProductOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     item=ProductOffer.objects.get(pk=pk)
     # category_list=Category.objects.all()
     # category_exclude=Category.objects.exclude(name=product.category)
@@ -684,6 +753,9 @@ def editProductOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def unlistProductOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items=ProductOffer.objects.all()
     product=ProductOffer.objects.get(pk=pk)
     try:
@@ -702,6 +774,9 @@ def unlistProductOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def listProductOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items=ProductOffer.objects.all()
     product=ProductOffer.objects.get(pk=pk)
     try:
@@ -720,6 +795,9 @@ def listProductOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def categoryOffers(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items=CategoryOffer.objects.all()
 
     context={
@@ -730,6 +808,9 @@ def categoryOffers(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def addCategoryOffer(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     categorys = Category.objects.filter(delete_status=1)
     
     if request.method == "POST":
@@ -753,6 +834,9 @@ def addCategoryOffer(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editCategoryOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     item=CategoryOffer.objects.get(pk=pk)
     category_list=Category.objects.exclude(id=item.category_id)
     if request.method=='POST':
@@ -783,6 +867,9 @@ def editCategoryOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def unlistCategoryOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items=CategoryOffer.objects.all()
     category=CategoryOffer.objects.get(pk=pk)
     try:
@@ -801,6 +888,9 @@ def unlistCategoryOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def listCategoryOffer(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     items=CategoryOffer.objects.all()
     category=CategoryOffer.objects.get(pk=pk)
     try:
@@ -823,6 +913,9 @@ def listCategoryOffer(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def couponList(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     coupons=Coupon.objects.all()
     context={
         'coupons':coupons,
@@ -832,6 +925,9 @@ def couponList(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def addCoupon(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     # coupons=Coupon.objects.first()
     if request.method=='POST':
         try:
@@ -870,6 +966,9 @@ def addCoupon(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def editCoupon(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     coupon=Coupon.objects.get(pk=pk)
     if request.method=='POST':
         try:
@@ -914,6 +1013,9 @@ def editCoupon(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def deleteCoupon(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     coupon=Coupon.objects.get(pk=pk)
     try:
         if coupon.active==True:
@@ -931,6 +1033,9 @@ def deleteCoupon(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def retainCoupon(request,pk):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     coupon=Coupon.objects.get(pk=pk)
     try:
         if coupon.active==False:
@@ -952,6 +1057,9 @@ def retainCoupon(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminIndex(request):
+    if not request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('userlog')
     
     end_date_str = request.POST.get('end_date')  # Assuming 'end_date' is the name of the input field for end date
 

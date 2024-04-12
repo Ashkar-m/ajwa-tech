@@ -24,6 +24,9 @@ from django.http import JsonResponse
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def userProfile(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     try:
         
         users = UserModel.objects.get(user_id=request.user.id)
@@ -75,6 +78,9 @@ def userProfile(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def addProfile(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     social_data=User.objects.get(id=request.user.id)
     try:
         users = UserModel.objects.get(user_id=request.user.id)
@@ -161,6 +167,9 @@ def addProfile(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def adduserAddress(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     profile=UserProfile.objects.get(pk=pk)
     if request.method == 'POST':
         address=request.POST.get('street_address')
@@ -182,6 +191,9 @@ def adduserAddress(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def edituserAddress(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     address=Address.objects.get(pk=pk)
 
     if request.method == 'POST':
@@ -212,6 +224,9 @@ def edituserAddress(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def deleteuserAddress(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     address=Address.objects.get(pk=pk)
     try:
         if address.is_primary == True:
@@ -227,6 +242,9 @@ def deleteuserAddress(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def editProfile(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     users=UserModel.objects.get(pk=pk)
     try:
         profile=UserProfile.objects.get(user_id=users.id)
@@ -280,6 +298,9 @@ def editProfile(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def socialAccount(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     social_data=User.objects.get(id=request.user.id)
     name=request.POST.get('name')
     mobile=request.POST.get('mobile')
@@ -307,6 +328,9 @@ def socialAccount(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def orderDetail(request,order_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     order = get_object_or_404(Order, id=order_id)
     # for i in order.order_items.all():   
     #     print(i.product.name)
@@ -316,6 +340,9 @@ def orderDetail(request,order_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def invoice(request,order_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     order = get_object_or_404(Order, id=order_id)
 
     order_items = order.order_items.all()
@@ -337,6 +364,9 @@ def invoice(request,order_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='userlog')
 def changePassword(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
 
     user=request.user
     if request.method == 'POST':
@@ -369,6 +399,9 @@ def changePassword(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def returnOrder(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     try:
         # cancel_order = Order.objects.prefetch_related('order_items__product').get(pk=pk)
         order_item=Order.objects.get(pk=pk)
@@ -418,6 +451,9 @@ def returnOrder(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def payment(request,order_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     order=Order.objects.get(id=order_id)
     amount=0
     amount=(order.total_price)*100
@@ -466,6 +502,9 @@ def payment(request,order_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def failedRazorpay(request,order_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     order=Order.objects.get(id=order_id)
     order.payment_method = 0
     order.payment_status = 1

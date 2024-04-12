@@ -46,6 +46,9 @@ def get_or_create_cart(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def cartView(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_cart = get_or_create_cart(request)
     cart_items = CartItem.objects.filter(cart=user_cart,is_active=True)
     category = Category.objects.all().order_by('name')
@@ -160,6 +163,9 @@ def cartView(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')   
 def addtoCart(request, product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_cart = get_or_create_cart(request)
     product = get_object_or_404(Product, id=product_id)
 
@@ -196,6 +202,9 @@ def addtoCart(request, product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removefromCart(request, product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_cart = get_or_create_cart(request)
     product = get_object_or_404(Product, id=product_id)
 
@@ -217,6 +226,9 @@ def removefromCart(request, product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removeButton(request,product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_cart = get_or_create_cart(request)
     product = get_object_or_404(Product, id=product_id)
     cart_item = CartItem.objects.filter(cart=user_cart, product=product, is_active=True).first()
@@ -231,6 +243,9 @@ def removeButton(request,product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def checkoutView(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
 
     last_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
 
@@ -390,6 +405,9 @@ def checkoutView(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def wishlistView(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_wishlist, created = Wishlist.objects.get_or_create(user_id=request.user.usermodel.id)
     
     wishlist_items = WishlistItem.objects.filter(wishlist=user_wishlist)
@@ -406,6 +424,9 @@ def wishlistView(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def addtoWishlist(request, product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_wishlist, created = Wishlist.objects.get_or_create(user_id=request.user.usermodel.id)
     # user_cart = get_or_create_cart(request)
     product = get_object_or_404(Product, id=product_id)
@@ -421,6 +442,9 @@ def addtoWishlist(request, product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def wishlistToCart(request, product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_object_or_404(Wishlist,user_id=request.user.usermodel.id)
     wishlist_item = get_object_or_404(WishlistItem,wishlist_id=wishlist.id, product_id=product_id)
@@ -440,6 +464,9 @@ def wishlistToCart(request, product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def removeWishlist(request,product_id):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_wishlist= Wishlist.objects.get(user_id=request.user.usermodel.id)
     # user_cart = get_or_create_cart(request)
     product = get_object_or_404(Product, id=product_id)
@@ -456,6 +483,9 @@ def removeWishlist(request,product_id):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def wallet(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     wallet,created=Wallet.objects.get_or_create(user_id=request.user.usermodel.id)
     category=Category.objects.all()
     money=100
@@ -475,6 +505,9 @@ def wallet(request):
 # @require_POST
 @login_required(login_url='/userlog/')
 def paymenthandler(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
     cart_data = Cart.objects.get(user_id=request.user.usermodel.id)
     cart_items = CartItem.objects.filter(cart_id=cart_data.id).exclude(quantity=0)
@@ -518,6 +551,9 @@ def paymenthandler(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')    
 def removeCoupon(request,pk):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_cart= Cart.objects.get(user_id=request.user.usermodel.id)
     cart_items = CartItem.objects.filter(cart=user_cart,is_active=True)   
     code=Coupon.objects.get(pk=pk)
@@ -551,6 +587,9 @@ def removeCoupon(request,pk):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def paymentSuccess(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
     user_order.payment_method = 0
     user_order.payment_status =1
@@ -562,6 +601,9 @@ def paymentSuccess(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def paymentFailure(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     user_order = Order.objects.filter(customer_id=request.user.usermodel.id).order_by('-date_ordered').first()
     user_order.payment_method = 0
     user_order.payment_status =0
@@ -573,6 +615,9 @@ def paymentFailure(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='/userlog/')
 def walletPayment(request,amount):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     wallet,created=Wallet.objects.get_or_create(user_id=request.user.usermodel.id)
     # money=int(request.POST.get('money'))
     # money = request.GET.get('money')

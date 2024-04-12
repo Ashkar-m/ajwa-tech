@@ -19,6 +19,10 @@ from django.contrib import messages
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def index(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
+
     product=Product.objects.all()
     for i in product:
         i.discounted_price=i.calculate_discounted_price()
@@ -30,6 +34,9 @@ def index(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def shop(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     product_list=Product.objects.all()
     for i in product_list:
         i.discounted_price=i.calculate_discounted_price()
@@ -67,6 +74,9 @@ def shop(request):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def detail(request,slug):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     product=Product.objects.get(slug=slug)
     
     product.discounted_price=product.calculate_discounted_price()
@@ -81,6 +91,9 @@ def detail(request,slug):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def category(request,slug):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     category = Category.objects.get(slug=slug)
     products = Product.objects.filter(category=category)
     # products = category.product_set.all()
@@ -117,6 +130,9 @@ def category(request,slug):
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def search(request):
+    if request.user.is_superuser:
+        messages.warning(request, 'You do not have permission to access the admin panel.')
+        return redirect('adminlog')
     category=Category.objects.all()
     context = {}
     try:

@@ -40,7 +40,7 @@
     </div>
 </div>
 {% for message in messages %}
-                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% endif %}">
                             {{ message }}
                         </div>
                         {% endfor %}
