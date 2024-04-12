@@ -155,14 +155,10 @@
                                         {{ user_order.address.district }}, {{ user_order.address.state }},
                                         {{ user_order.address.country }}, PINCODE: {{ user_order.address.zip_code }}
                                     </option>
-                                    <!-- {% for fadrs in filtered_address %}
-                                        <option value="{{ fadrs.id }}">
-                                            {{ fadrs.street_address }}, {{ fadrs.city }}, {{ fadrs.district }},
-                                            {{ fadrs.state }}, {{ fadrs.country }}, PINCODE: {{ fadrs.zip_code }}
-                                        </option>
-                                    {% endfor %} -->
+                                    
                                     {% for adrs in address %}
-                                    {% if not adrs.is_primary %}
+                                    
+                                    {% if adrs.id != user_order.address.id %}
                                         <option value="{{ adrs.id }}">
                                             {{ adrs.street_address }}, {{ adrs.city }}, {{ adrs.district }},
                                             {{ adrs.state }}, {{ adrs.country }}, PINCODE: {{ adrs.zip_code }}

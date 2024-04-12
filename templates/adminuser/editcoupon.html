@@ -108,7 +108,7 @@
         const minAmountInput = document.getElementById('coupon_minimum_amount');
         const discountTypeSelect = document.getElementById('coupon_discount_type');
 
-        discountTypeSelect.addEventListener('change', function() {
+        discountInput.addEventListener('input', function() {
             const discountValue = parseFloat(discountInput.value);
             const minAmountValue = parseFloat(minAmountInput.value);
             const selectedDiscountType = parseInt(discountTypeSelect.value);

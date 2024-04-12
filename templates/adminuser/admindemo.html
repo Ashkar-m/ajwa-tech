@@ -400,6 +400,7 @@
                                     <th>Product price</th>
                                     <th>Product offer</th>
                                     <th>Total item sold</th>
+                                    <th>Total sale</th>
                                 </tr>
                                 {% for offer in offers %}
                                 <tr>
@@ -409,12 +410,15 @@
                                     <td><h5 class="time-title p-0">{{ offer.product_price }}</h5></td>
                                     <td><h5 class="time-title p-0">{{ offer.total_offer_price }}</h5></td>
                                     <td><h5 class="time-title p-0">{{ offer.count }}</h5></td>
+                                    <td><h5 class="time-title p-0">{{ offer.total_price }}</h5></td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                    <p style="text-align: right;"><strong style="font-size: larger;">Total Payment:</strong>{{ total_payment_amount }}</p>
+                    <p style="text-align: right;"><strong style="font-size: larger;">Total offers:</strong>{{ total_offer_price_all_products }}</p>
+                    <p style="text-align: right;"><strong style="font-size: larger;">Total Coupon Discount:</strong>{{ total_coupon_price_all_products }}</p>
+                    <p style="text-align: right;"><strong style="font-size: larger;">Total Payment:</strong>{{ Total_savings }}</p>
                 </div>
             </div>
         </div>

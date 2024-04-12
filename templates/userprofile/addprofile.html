@@ -176,7 +176,9 @@
                                                     {% if profile_data.gender %}
                                                         <option value="{{ profile_data.gender }}" selected> {% if profile_data.gender == 'F' %} Female {% elif profile_data.gender == 'M' %}Male {% elif profile_data.gender == 'O' %}Other {% endif %} </option>
                                                         {% for choice in gender.Gender.choices %}
+                                                        {% if profile_data.gender != choice.0 %}
                                                         <option value="{{ choice.0 }}">{{ choice.1 }}</option>
+                                                        {% endif %}
                                                         {% endfor %}
                                                     {% else %}
                                                         {% for choice in gender.Gender.choices %}

@@ -36,6 +36,9 @@ from django.utils import timezone
 
 from collections import Counter
 
+from django.db.models import F, Value
+from django.db.models.functions import Coalesce
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def adminLogin(request):
@@ -84,9 +87,14 @@ def adminUsermng(request):
     context={'users':users}
     return render(request,'adminuser/usermanagement.html',context=context)
 
+
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(login_url='adminlog')
 def adminProductmng(request):
+    
+    def sort_by_last_activity(products):
+        return sorted(products, key=lambda x: x.latest_timestamp, reverse=True)
+
     product_data=Product.objects.all().annotate(
         latest_timestamp=Case(
             When(updated_at__gt=F('created_at'), then=F('updated_at')),
@@ -94,6 +102,21 @@ def adminProductmng(request):
             output_field=CharField()
         )
     ).order_by('-latest_timestamp')
+
+    # product_data = Product.objects.annotate(
+    #     last_activity=Coalesce('updated_at', 'created_at', Value('1970-01-01'), output_field=DateTimeField())
+    # ).order_by('-last_activity')
+
+    product_data = sort_by_last_activity(product_data)
+
+    # product_data = Product.objects.annotate(
+    #     last_activity=Case(
+    #         When(updated_at__isnull=False, then=F('updated_at')),
+    #         When(created_at__isnull=False, then=F('created_at')),
+    #         default=Value('1970-01-01'),  # Default date if both updated_at and created_at are null
+    #         output_field=DateTimeField()
+    #     )
+    # ).order_by('-last_activity')
     records_per_page = 10
     paginator = Paginator(product_data,records_per_page)
 
@@ -541,15 +564,15 @@ def editOrder(request,pk):
 
             # Save the updated product
             orders.save()
-
             messages.success(request, "Successfully updated product.")
             return redirect(adminOrdermng)
+
         except IntegrityError:
             messages.error(request, "Product with this name already exists.")
         except Exception as e:
             messages.error(request, f"Error deleting categories: {e}")
 
-
+   
     context={'orders':orders,
             'order_statuses':order_statuses,
             'payment_methods':payment_methods,
@@ -584,8 +607,6 @@ def cancelOrder(request, pk):
                 messages.success(request, "Order canceled successfully")
     except Order.DoesNotExist:
         messages.error(request, "Order does not exist.")
-    # except Exception as e:
-    #     messages.error(request, f"Error: {e}")
 
     return redirect('index')
 
@@ -877,7 +898,7 @@ def editCoupon(request,pk):
 
 
             if coupon_description is not None:
-                print(coupon_description)
+                # print(coupon_description)
                 coupon.description=coupon_description
                 coupon.save()
             messages.success(request,'Successfully edited the coupon.') 
@@ -941,21 +962,7 @@ def adminIndex(request):
             messages.error(request,'An error occured')
     else:
         end_date = datetime.now()
-    # print(end_date)
-
-    # day = 30  # Default value for days if start_date is not provided
-
-    # start_date_str = request.POST.get('start_date')
-    # if start_date_str:
-    #     try:
-    #         sample_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-    #         day = (end_date - sample_date).days
-    #     except ValueError:
-    #         messages.error(request,'An error occured')
-
-    # start_date = end_date - timedelta(days=day)
-
-    # print(start_date)
+    
     day=30
     if request.method == 'POST':
         start_date_str = request.POST.get('start_date')
@@ -1033,7 +1040,6 @@ def adminIndex(request):
     sorted_products = sorted(product_counts.items(), key=lambda x: x[1], reverse=True)
     sorted_product_data = [{'name': item[0][0], 'category': item[0][1], 'price': item[0][2], 'count': item[1]} for item in sorted_products]
 
-
     # top 5 products
     category_counts = Counter()
     for ordered_cat in orders:
@@ -1068,8 +1074,11 @@ def adminIndex(request):
         product_count = offer['count']
         total_offer_price = offer['total_offer_price']
         total_coupon_price = offer['total_coupon_price']
+        total_price = product_price * product_count
+        offer['total_price']=total_price
+        # print(total_price)
 
-        # # Do whatever you need with the data, such as printing or storing it
+
         # print(f"Product: {product_name}, Price: {product_price}, Count: {product_count}, Total Offer Price: {total_offer_price}, Total Coupon Price: {total_coupon_price}")
 
     # If you want the total offer_price and total coupon_price across all products, you can aggregate them again

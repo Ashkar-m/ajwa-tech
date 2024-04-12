@@ -43,7 +43,7 @@
                             {% for product in products %}
                             <tr>
                                 <td>{{ product.id }}</td>
-                                <td>{% for product_image in product.images.all|slice:":1" %}<img src="{{ product_image.image.url }}" alt="Product Image" style="height: 50px; width:50px"><br><a href="{% url 'addproductimage' pk=product.id %}">Product Image</a>{% endfor %} </td>
+                                <td>{% for product_image in product.images.all|slice:":1" %}<img src="{{ product_image.image.url }}" alt="Product Image" style="height: 50px; width:50px">{% endfor %}<br><a href="{% url 'addproductimage' pk=product.id %}">Product Image</a> </td>
                                 <td>{{ product.name }}</td>
                                 <td>{{ product.description|truncatewords:20 }}</td>
                                 <td>{{ product.price }}</td>

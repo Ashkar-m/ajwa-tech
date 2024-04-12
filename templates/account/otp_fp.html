@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static '/css/login/register.css' %}">
+    <title>AJWA TECH-Otp Page</title>
+</head>
+<body>
+
+    <nav class="navbar">
+            <span class="navbar-title">AJWA TECH</span>
+    </nav>
+
+
+    <section class="container forms">
+    
+    <div class="form signup">
+    <div class="form-content">
+        <header>Verify OTP</header>
+    <form method="post" >
+        {% csrf_token %}
+        {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="field input-field">
+            <input type="text" name="otp"  required placeholder="Enter OTP" class="input" >
+        </div>
+        <!-- <label for="otp">Enter OTP:</label>
+        <input type="text" name="otp" required>
+        <button type="submit">Verify OTP</button> -->
+
+        <div class="field button-field">
+            <input class="submit" type="submit" value="Verify OTP">
+        </div>
+    </form>
+    </div>
+    </div>
+    </section>
+    <script>
+        // Wait for the DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all elements with the class 'messages' (adjust as needed)
+            var messageElements = document.querySelectorAll('.success-message,.error-message');
+
+            // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+            messageElements.forEach(function(messageElement) {
+                setTimeout(function() {
+                    messageElement.style.display = 'none';
+                }, 5000);  // Adjust the time as needed (in milliseconds)
+            });
+        });
+    </script>
+</body>
+</html>

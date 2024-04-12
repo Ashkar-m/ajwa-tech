@@ -370,6 +370,7 @@ def changePassword(request):
 @login_required(login_url='/userlog/')
 def returnOrder(request,pk):
     try:
+        # cancel_order = Order.objects.prefetch_related('order_items__product').get(pk=pk)
         order_item=Order.objects.get(pk=pk)
         order_product=OrderItem.objects.filter(order_id=order_item.id)
         order_item.Order_status='4'
@@ -378,6 +379,10 @@ def returnOrder(request,pk):
             i.product.stock+=1
             i.product.save()
         # order_item.save()
+        if (order_item.payment_method == 0 and order_item.payment_status == 1) or (order_item.payment_method == 2 and order_item.payment_status == 1):
+                    wallet , created =Wallet.objects.get_or_create(user_id=order_item.customer_id)
+                    wallet.balance+=order_item.total_price
+                    wallet.save()
         messages.success(request,'Successfully Returned the proudcts')
         return redirect('index')
     except Exception as e:

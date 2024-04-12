@@ -27,6 +27,15 @@ from django.views.decorators.cache import cache_control
 
 from django.views.decorators.csrf import csrf_protect
 
+import string
+
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+from django.utils import timezone
+from datetime import timedelta
+
+from django.core.exceptions import ObjectDoesNotExist
+
 
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def userLog(request):
@@ -234,6 +243,194 @@ def resendOtp(request, pk):
 
     return render(request, 'account/verify.html', {'id': pk})
 
+# def forgotPassword(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         user = User.objects.filter(email=email).first()
+
+#         if user:
+#             # Generate a random password reset token
+#             token = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
+#             user.usermodel.reset_password_token = token
+#             user.usermodel.save()
+
+#             # Send password reset link via email
+#             reset_link = request.build_absolute_uri('/') + f'reset-password?token={token}'
+#             subject = 'Password Reset Request'
+#             message = f'Hi {user.username},\n\nPlease click on the following link to reset your password:\n\n{reset_link}\n\nThis link will expire in 24 hours.\n\nBest regards,\nYour Website Team'
+#             sender_email = settings.EMAIL_HOST_USER
+#             send_mail(subject, message, sender_email, [email])
+
+#             messages.success(request, 'Password reset link sent. Check your email.')
+#             return redirect(userLog)
+#         else:
+#             messages.error(request, 'User with that email does not exist.')
+
+#     return render(request, 'account/forgot_password.html')
+
+
+# def resetPassword(request):
+#     if request.method == 'GET':
+#         token = request.GET.get('token')
+#         try:
+#             uidb64 = token.split('-')[0]
+#             uid = urlsafe_base64_decode(uidb64).decode()
+#             user = User.objects.get(id=uid)
+#             if default_token_generator.check_token(user, token):
+#                 # Check if the token is expired (valid for 24 hours)
+#                 if user.profile.reset_password_token_expiry >= timezone.now():
+#                     if request.POST.get('new_password') and request.POST.get('confirm_password'):
+#                         new_password = request.POST['new_password']
+#                         confirm_password = request.POST['confirm_password']
+#                         if new_password == confirm_password:
+#                             # Set the new password and clear the reset token
+#                             user.set_password(new_password)
+#                             user.profile.reset_password_token = None
+#                             user.profile.reset_password_token_expiry = None
+#                             user.profile.save()
+#                             user.save()
+#                             messages.success(request, 'Your password has been reset successfully.')
+#                             return redirect('login')
+#                         else:
+#                             messages.error(request, 'Passwords do not match.')
+#                     return render(request, 'reset_password.html', {'token': token})
+#                 else:
+#                     messages.error(request, 'The password reset link has expired. Please request a new one.')
+#                     return redirect(forgotPassword)
+#             else:
+#                 messages.error(request, 'Invalid password reset link.')
+#                 return redirect(forgotPassword)
+#         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+#             messages.error(request, 'Invalid password reset link.')
+#             return redirect(forgotPassword)
+
+#     return render(request, 'reset_password.html')
+
+# def resetPassword(request):
+#     if request.method == 'GET':
+#         token = request.GET.get('token')
+#         try:
+#             uidb64, token = token.split('=')  # Split token into uidb64 and token parts
+#             uid = urlsafe_base64_decode(uidb64).decode()
+#             print(uid)
+#             user = User.objects.get(id=uid)
+#             if default_token_generator.check_token(user, token):
+#                 # Check if the token is expired (valid for 24 hours)
+#                 if user.profile.reset_password_token_expiry >= timezone.now():
+#                     if request.POST.get('new_password') and request.POST.get('confirm_password'):
+#                         new_password = request.POST['new_password']
+#                         confirm_password = request.POST['confirm_password']
+#                         if new_password == confirm_password:
+#                             # Set the new password and clear the reset token
+#                             user.set_password(new_password)
+#                             user.profile.reset_password_token = None
+#                             user.profile.reset_password_token_expiry = None
+#                             user.profile.save()
+#                             user.save()
+#                             messages.success(request, 'Your password has been reset successfully.')
+#                             return redirect('login')
+#                         else:
+#                             messages.error(request, 'Passwords do not match.')
+#                     return render(request, 'reset_password.html', {'token': token})
+#                 else:
+#                     messages.error(request, 'The password reset link has expired. Please request a new one.')
+#                     return redirect(forgotPassword)
+#             else:
+#                 messages.error(request, 'Invalid password reset link.')
+#                 return redirect(forgotPassword)
+#         except (ValueError, User.DoesNotExist, OverflowError):
+#             messages.error(request, 'Invalid password reset link.')
+#             return redirect(forgotPassword)
+
+#     return render(request, 'reset_password.html')
+
+def forgotPassword(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        if User.objects.filter(email=email).exists():
+            user = User.objects.filter(email=email).first()
+            
+            otp = random.randint(100000, 999999)
+
+            # Consider using a safer method to store OTP, like Django's cache framework
+
+            # Store OTP in session (consider safer alternatives)
+            request.session['otp_fp'] = otp
+            request.session['otp_timestamp'] = str(timezone.now())
+
+            # Send OTP via email
+            try:
+                send_mail('Reset Ajwa Tech password', f"Verify your mail by OTP: {otp}", settings.EMAIL_HOST_USER, [email], fail_silently=False)
+            except Exception as e:
+                messages.error(request, "Failed to send email. Please try again later.")
+                return redirect(userReg)
+            
+            # Set a cookie for OTP entry
+            # red = redirect(f'/{user.id}/otp_fp/verify/')
+            red = redirect(f'/otp_fp/{user.id}')
+            red.set_cookie("can_otp_enter", True, max_age=600)  # Adjust max_age as needed
+            messages.success(request, 'For reset password please verify the OTP sent to your email.')
+            return red
+            
+        else:
+            messages.error(request, "The account doesn't exist!")
+            return redirect(forgotPassword)
+        
+    return render(request, 'account/forgot_password.html')
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True, max_age=0)
+def otp_fp_verify(request, pk):
+    uid=None
+    try:
+        profile = User.objects.get(id=pk)
+        if request.method == "POST":
+            stored_otp = request.session.get('otp_fp')
+            entered_otp = request.POST.get('otp')
+
+            if stored_otp and entered_otp and int(stored_otp) == int(entered_otp):
+                # Clear OTP session variables after successful verification
+                del request.session['otp_fp']
+                del request.session['otp_timestamp']
+                
+                request.session['uid'] = profile.id
+                messages.success(request, 'Now you can edit your password.')
+                
+                # Redirect to the reset_password page after successful activation
+                return redirect (resetPassword,user_id=profile.id)
+
+            messages.error(request, 'Wrong OTP. Try again')
+
+    except ObjectDoesNotExist:
+        messages.error(request, 'Error: Account not found.')
+    except MultipleObjectsReturned:
+        messages.error(request, 'Error: Multiple accounts found for the given UID.')
+
+    return render(request, "account/otp_fp.html")
+
+
+@cache_control(no_cache=True, no_store=True, must_revalidate=True, max_age=0)
+def resetPassword(request, user_id):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password == confirm_password:
+            try:
+                user = User.objects.get(pk=user_id)
+                user.set_password(password)
+                user.save()
+                # Update the session auth hash to prevent logout after password change
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Password reset successful')
+                return redirect(userLog)
+            except ObjectDoesNotExist:
+                messages.error(request, 'User does not exist.')
+                return redirect(resetPassword, user_id=user_id)
+        else:
+            messages.error(request, 'Passwords do not match.')
+            return redirect(resetPassword, user_id=user_id)
+    else:
+        return render(request, "account/reset_password.html", {'user_id': user_id})
 
 @csrf_protect
 @login_required(login_url='/userlog/')
