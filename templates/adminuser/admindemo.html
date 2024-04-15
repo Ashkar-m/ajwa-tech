@@ -6,7 +6,7 @@
 <div class="content">
     <center>
         {% for message in messages %}
-                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% endif %}">
+                        <div class="{% if message.tags == 'success' %}success-message{% elif message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% endif %}">
                             {{ message }}
                         </div>
         {% endfor %}
@@ -493,4 +493,20 @@ function exportToPDF() {
     XLSX.writeFile(fp, 'test.xlsx');
     }
 </script>
+
+<script>
+    // Wait for the DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with the class 'messages' (adjust as needed)
+        var messageElements = document.querySelectorAll('.success-message,.error-message,.warning-message');
+
+        // Set a timeout to hide each message after 5000 milliseconds (5 seconds)
+        messageElements.forEach(function(messageElement) {
+            setTimeout(function() {
+                messageElement.style.display = 'none';
+            }, 5000);  // Adjust the time as needed (in milliseconds)
+        });
+    });
+</script>
+
 {% endblock %}
