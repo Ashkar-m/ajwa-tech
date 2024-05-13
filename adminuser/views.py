@@ -101,22 +101,13 @@ def adminProductmng(request):
         messages.warning(request, 'You do not have permission to access the user side.')
         return redirect('userlog')
 
-    def sort_by_last_activity(products):
-        return sorted(products, key=lambda x: x.latest_timestamp, reverse=True)
-
-    product_data=Product.objects.all().annotate(
-        latest_timestamp=Case(
-            When(updated_at__gt=F('created_at'), then=F('updated_at')),
-            default=F('created_at'),
-            output_field=CharField()
-        )
-    ).order_by('-latest_timestamp')
+    product_data=Product.objects.all().order_by('-created_at')
 
     # product_data = Product.objects.annotate(
     #     last_activity=Coalesce('updated_at', 'created_at', Value('1970-01-01'), output_field=DateTimeField())
     # ).order_by('-last_activity')
 
-    product_data = sort_by_last_activity(product_data)
+    # product_data = sort_by_last_activity(product_data)
 
     # product_data = Product.objects.annotate(
     #     last_activity=Case(
@@ -625,6 +616,39 @@ def editOrder(request,pk):
             orders.payment_status = payment_status
             orders.is_cancel = cancel
             
+            if order_stat != 3 and order_status != '4' :
+                if order_status == '4' and return_stat == False : 
+                    if orders.payment_status == '1' :
+                        if orders.payment_method == 2 :
+                            wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                            wallet.balance += orders.total_price
+                            wallet.save()
+                        if orders.payment_method == 0 :
+                            wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                            wallet.balance += orders.total_price
+                            wallet.save()
+                            
+            if order_status == '4' and return_stat == False: 
+                    if orders.payment_status == '1' :
+                        if orders.payment_method == 2 :
+                            wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                            wallet.balance += orders.total_price
+                            wallet.save()
+                        if orders.payment_method == 0 :
+                            wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                            wallet.balance += orders.total_price
+                            wallet.save()
+
+            if order_status == '3' and cancel_stat == False: 
+                if orders.payment_status == '1' :
+                    if orders.payment_method == 2 :
+                        wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                        wallet.balance += orders.total_price
+                        wallet.save()
+                    if orders.payment_method == 0 :
+                        wallet, created = Wallet.objects.get_or_create(user_id=orders.customer_id)
+                        wallet.balance += orders.total_price
+                        wallet.save()
 
             # Save the updated product
             orders.save()
@@ -647,7 +671,7 @@ def editOrder(request,pk):
 @login_required(login_url='/userlog/')
 @transaction.atomic
 def cancelOrder(request, pk):
-    if not request.user.is_superuser:
+    if request.user.is_superuser:
         messages.warning(request, 'You do not have permission to access the user side.')
         return redirect('userlog')
     try:
@@ -678,6 +702,12 @@ def cancelOrder(request, pk):
     return redirect('index')
 
 
+def adminCancel(request):
+    try:
+        order=Order.objects.get(pk=pk)
+    except Exception as e:
+        messages.error(request,'Hey')
+    return redirect(index)
 # ------------------------------------------------------------------offer management------------------------------------------------------
 
 

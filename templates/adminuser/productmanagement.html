@@ -40,7 +40,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for product in products %}
+                            {% for product in products|dictsort:"updated_at" %}
                             <tr>
                                 <td>{{ product.id }}</td>
                                 <td>{% for product_image in product.images.all|slice:":1" %}<img src="{{ product_image.image.url }}" alt="Product Image" style="height: 50px; width:50px">{% endfor %}<br><a href="{% url 'addproductimage' pk=product.id %}">Product Image</a> </td>

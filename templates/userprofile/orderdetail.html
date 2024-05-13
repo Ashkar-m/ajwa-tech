@@ -439,7 +439,7 @@
                                                 <td class="align-middle"><a href="">Payment Failed</a></td>
                                                 {% elif order.Order_status == 4 %}
                                                 <td class="align-middle"><a href=""></a></td>
-                                                {% elif order.is_cancel %}
+                                                {% elif order.Order_status == 3 %}
                                                 <td class="align-middle"><a href="">cancelled</a></td>
                                                 {% else %}
                                                 <td class="align-middle">

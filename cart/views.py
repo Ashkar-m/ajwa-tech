@@ -262,6 +262,7 @@ def checkoutView(request):
     
     if not address:
         messages.warning(request,"You need to create an address first.")
+        return redirect('adduseraddress',pk=request.user.usermodel.id)
 
     for cart_item in cart_items:
         if cart_item.product.stock < 0:

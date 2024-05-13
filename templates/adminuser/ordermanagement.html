@@ -60,7 +60,7 @@
                                     {% else %}Invalid
                                     {%endif%}</td>
                                 <td>{{ order.date_ordered }}</td>
-                                <td>{% if  order.is_cancel %}cancelled{% else %}Not cancelled {% endif %}</td>
+                                <td>{% if  order.Order_status == 3 %}cancelled{% else %}Not cancelled {% endif %}</td>
                                 <td>{{ order.total_price }}</td>
                                 <!-- <td>{{ order.address }}</td> -->
                                 <td>{{ order.customer }}</td>

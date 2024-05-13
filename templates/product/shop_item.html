@@ -160,7 +160,11 @@
                             <h6 class="text-truncate mb-3"><a href="{% url 'detail' slug=product.slug %}" class="fw-bold">{{ product.name }}</a></h6>
                             
                             <div class="d-flex justify-content-center">
+                                {% if product.price > product.discounted_price %}
                                 <h6>${{ product.discounted_price }}</h6><h6 class="text-muted ml-2"><del>{{ product.price }}</del></h6>
+                                {% else %}
+                                <h6>${{ product.price }}</h6>
+                                {% endif %}
                             </div>
                         </div>
                     

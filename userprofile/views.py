@@ -25,7 +25,7 @@ from django.http import JsonResponse
 @login_required(login_url='userlog')
 def userProfile(request):
     if request.user.is_superuser:
-        messages.warning(request, 'You do not have permission to access the admin panel.')
+        messages.warning(request, 'You do not have permission to access the admin panel.') 
         return redirect('adminlog')
     try:
         
@@ -317,7 +317,6 @@ def socialAccount(request):
         user_social.save()
 
         return redirect(addProfile)
-    
     email_address=request.user.email
     print(email_address)
 
