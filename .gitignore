@@ -207,4 +207,4 @@ Thumbs.db
 *.mov
 *.wmv
 /images/
-/*/settings.py
+ecom/settings.py
