@@ -26,6 +26,7 @@ Ajwa Tech is a modern e-commerce website designed for selling electronics. Built
 - **Secure Payment Integration** – Supports **Razorpay** for seamless transactions.
 - **OTP Authentication** – **Django send_mail** method for secure login verification.
 
+
 ## 🔧 Installation & Setup
 1. Clone the repository:
    ```sh
@@ -59,7 +60,7 @@ Ajwa Tech is a modern e-commerce website designed for selling electronics. Built
 - Admins can manage users, products, orders, and sales reports efficiently.
 
 ## 📫 Contact & Support
-For any queries or contributions, feel free to reach out!
+For any queries or contributions, feel free to reach out. Your support is achievement for me!
 
 Happy shopping! 🛒🚀
 
